@@ -14,33 +14,33 @@ selected = c(
   "type","house_type", "flat_type", "lab_mrkt_reg", "guest_washroom", "number_hits_of_ad"
 )
 
-rents_homes = fread("data/homes-rents_2016-2021.csv")
-rents_aparts = fread("data/apartments-rents_2016-2021.csv")
+rent_homes = fread("data/homes-rents_2016-2021.csv")
+rent_aparts = fread("data/apartments-rents_2016-2021.csv")
 
 # rm duplicates
-nrh = nrow(rents_homes)
-idx = rents_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rents_homes = rents_homes[idx, ]
-nrow(rents_homes)/nrh
-rents_homes[, spell := NULL]
+nrh = nrow(rent_homes)
+idx = rent_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
+rent_homes = rent_homes[idx, ]
+nrow(rent_homes)/nrh
+rent_homes[, spell := NULL]
 rm(idx)
 
-nra = nrow(rents_aparts)
-idx = rents_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rents_aparts = rents_aparts[idx, ]
-nrow(rents_aparts)/nra
-rents_aparts[, spell := NULL]
+nra = nrow(rent_aparts)
+idx = rent_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
+rent_aparts = rent_aparts[idx, ]
+nrow(rent_aparts)/nra
+rent_aparts[, spell := NULL]
 rm(idx)
 
 
 # how to combine houses and flats?
 special_code = 99L # by construction
-rents_homes[, flat_type := special_code]
-rents_aparts[, house_type := special_code]
-rents_homes[, plot_size := NULL]  # does not exist for apartments
-rents_aparts[, rent_warm := NULL] # does not exist for homes
+rent_homes[, flat_type := special_code]
+rent_aparts[, house_type := special_code]
+rent_homes[, plot_size := NULL]  # does not exist for apartments
+rent_aparts[, rent_warm := NULL] # does not exist for homes
 
-rents = rbindlist(list(rents_homes, rents_aparts), use.names = TRUE, fill = TRUE)
+rents = rbindlist(list(rent_homes, rent_aparts), use.names = TRUE, fill = TRUE)
 if (!("grid_id" %in% names(rents))) {
   if ("ergg_1km" %in% names(rents)) {
     setnames(rents, "ergg_1km", "grid_id")
@@ -51,7 +51,7 @@ if (!("grid_id" %in% names(rents))) {
 # explicit nas - do not apply to one or another (flat/home)
 ## usually these are c("floor", "elevator", "balcony", "public_housing_cert", "garden")
 explicit_nas = with(
-  list(x = names(rents_homes), y = names(rents_aparts)),
+  list(x = names(rent_homes), y = names(rent_aparts)),
   setdiff(union(x, y), intersect(x, y))
 )
 rents[, (explicit_nas) := lapply(.SD, \(x) nafill(x, fill=0)), .SDcols=explicit_nas]
@@ -60,7 +60,7 @@ setnames(rents, "kid2019", "did")
 setnames(rents, "rent_cold", "rent")
 rents = rents[grid_id > 0 & zipcode > 0 & rent > 0 & floor_space > 0 &
   num_rooms > 0 & utilities > 0, ]
-rm(rents_homes, rents_aparts)
+rm(rent_homes, rent_aparts)
 
 
 ## cleaning
@@ -383,10 +383,10 @@ rents = rents[exp(lnrent_sqm) >= 1 & exp(lnrent_sqm) <= 50 & floor_space >= 30 &
 nrow(rents)/n
 
 # write to disk ----
-if (file.exists("data/processed/rents_homes-apartments_ready.csv")) {
+if (file.exists("data/processed/rent_homes-apartments_ready.csv")) {
   warning("File has been overwritten!", call. = FALSE)
-  fwrite(rents, "data/processed/rents_homes-apartments_ready.csv")
+  fwrite(rents, "data/processed/rent_homes-apartments_ready.csv")
 } else{
-  fwrite(rents, "data/processed/rents_homes-apartments_ready.csv")
+  fwrite(rents, "data/processed/rent_homes-apartments_ready.csv")
 }
-if (FALSE) haven::write_dta(rents, "data/processed/rents_homes-apartments_ready.dta")
+if (FALSE) haven::write_dta(rents, "data/processed/rent_homes-apartments_ready.dta")
