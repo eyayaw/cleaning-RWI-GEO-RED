@@ -1,0 +1,71 @@
+var_de,var_en,label
+ags2019,ags2019,"Municipality Identifier (AGS, 2019)"
+ajahr,ad_begin_year,"Beginning of ad, year"
+amonat,ad_begin_mon,"Beginning of ad, month"
+anbieter,provider_type,Type of provider
+anzahletagen,num_floors,Number of floors
+aufzug,elevator,
+ausstattung,equipment,Facilities of the object
+badezimmer,num_bathrooms,Number of bathrooms
+balkon,balcony,Balcony
+baujahr,constr_year,Year of construction
+bauphase,constr_phase,Construction phase
+blid,state,German state
+Classification of object identifiers used more than once,,
+courtage,brokerage,Brokerage at contract conclusion
+denkmalobjekt,protected_building,Protected historic building
+dupID_gen,dupID_gen,dupID_gen
+duplicateid,duplicateid,duplicate identifier
+einbaukueche,kitchen,
+einliegerwohnung,granny_flat,Granny flat in the object
+ejahr,ad_end_year,"Ending of ad, year"
+emonat,ad_end_mon,"Ending of ad, month"
+energieausweistyp,energy_certificate_type,Type of Energy Performance Certificates (EPCs)
+energieeffizienzklasse,energy_efficiency_class,Energy Efficiency Rating
+erg_amd,lab_mrkt_reg,"Local labour market (Kosfeld and Werner, 2012)"
+etage,floor,Floor location of apartment
+ev_kennwert,energy_consumption_per_year_sqm,Energy consumption per year and square meter
+ev_wwenthalten,warm_water_consumption,Warm water consumption included in energy consumption
+ferienhaus,holiday_house,Usable as holiday house
+foerderung,public_housing_cert,Public housing eligibility certificate for renting
+freiab,available_from,Available from
+gaestewc,guest_washroom,Guest toilet
+garten,garden,Garden
+gid2015,gid2015,"Municipality Identifier (AGS, 2015)"
+gid2019,mid_ags2019,"Municipality identifier (AGS, 2019)"
+gkz,mid_is24,Municipality identifier (given by IS24)
+grundstuecksflaeche,plot_size,Plot area of the object
+heizungsart,heating_type,Type of heating
+hits,number_hits_of_ad,Number of hits of ad
+immobilientyp,type,"Type of real estate, hm,hk,wm,wk"
+jahr,year,
+kategorie_Haus,house_type,House type
+kategorie_Wohnung,flat_type,Flat type
+kaufpreis,price,Purchase price in Euro
+kaufvermietet,rented_when_sold,Rented when sold
+keller,basement,Basement
+kid2015,kid2015,"District identifier (AGS, 2015)"
+kid2019,kid2019,"District identifier (AGS, 2019)"
+laufzeittage,days_of_availability_of_ad,Days of availability of ad
+letzte_modernisierung,renov_year,Year of last modernization
+lieferung,date_data_retrieval,Date of data retrieval
+mieteinnahmenpromonat,rental_income_per_month,Rental income per month in EUR
+mietekalt,rent_cold,Rent net of utilities
+mietekaution,security_deposit,Security deposit
+mietewarm,rent_warm,Inclusive rent in EUR
+nebenkosten,utilities,Monthly costs for utilites in Euro
+nebenraeume,num_ancillary_rooms,Number of ancillary rooms
+nutzflaeche,usable_floor_space,Usable floor space
+obid,obid,Object identifier
+objektzustand,condition,Condition of object
+parkplatz,parking_space,Garage/parking space available
+parkplatzpreis,parking_space_price,Price of parking space (euro)
+plz,zipcode,Address: zipcode
+rollstuhlgerecht,wheelchair_accessible,"Wheelchair accessible, no steps"
+schlafzimmer,num_bedrooms,Number of bedrooms
+spell,spell,Spell counter within object identifier
+uniqueID_gen,uniqueid_gen,Unique object identifier (generated)
+wohnflaeche,floor_space,Living space in sqm
+zimmeranzahl,num_rooms,Number of rooms
+r1_id,grid_id,1-sqkm raster cell following INSPIRE
+ergg_1km,grid_id_char,1-sqkm raster cell following INSPIRE
