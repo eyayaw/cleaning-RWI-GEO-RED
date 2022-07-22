@@ -14,7 +14,7 @@ extract_raw_files = FALSE # if not extracted, extract files
 # (flagged as `-8,Variable trifft auf diesen Datensatzyp nicht zu|Variable for other types only`), 
 # e.g., `mietekalt` in houses for sale (HK) data set. This variable applies to rent data sets only so should be removed.
 # 3. translates variable names from german to english
-# 4. merges data sets into one as the data sets come splitted in chunks due to their size
+# 4. combines data sets together as the data sets come splitted in chunks (as their size is huge)
 
 
 # extract if necessary
@@ -62,7 +62,7 @@ for (h in seq_along(dlist)) {
     full.names = TRUE
   )
   if (length(file_list) == 0) stop('No list of files found.', call. = FALSE)
-  # sorting was necessary because HKSUF10 was coming second instead of 10th
+  # sorting is necessary because dir() puts HKSUF10 second instead of 10th
   file_list = file_list[order(as.integer(regmatches(basename(file_list), regexpr("[0-9]+", basename(file_list)))))]
   names(file_list) = tools::file_path_sans_ext(basename(file_list))
   var_list = lapply(file_list, read_dta, n_max = 10) |> lapply(names)
