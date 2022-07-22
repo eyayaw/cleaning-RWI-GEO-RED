@@ -5,9 +5,19 @@ source("helpers/helpers.R")
 
 # params
 since_when = 2016 # keep observations since
-extract_raw_files = FALSE
+extract_raw_files = FALSE # if not extracted, extract files
 
-# extract if not available
+
+# This scripts extracts the big zip file that rwi ships the data with:
+# 1. removes varaibles that do not exist across all years, e.g. bef1-bef9
+# 2. removes variables that do not apply to a certain data set 
+# (flagged as `-8,Variable trifft auf diesen Datensatzyp nicht zu|Variable for other types only`), 
+# e.g., `mietekalt` in houses for sale (HK) data set. This variable applies to rent data sets only so should be removed.
+# 3. translates variable names from german to english
+# 4. merges data sets into one as the data sets come splitted in chunks due to their size
+
+
+# extract if necessary
 ## caution: utils::unzip may truncate extraction if the size is > 4GB so don't rely on it
 ## better to do it with the command line or manually with 7zip etc
 zipfile = "../RED_v6.1.zip"
@@ -15,7 +25,7 @@ extractdir = paste0("../.", file.stem(zipfile)) # create a hidden folder
 
 if (extract_raw_files) {
   # o for overwrite d for directory
-  system(sprintf("unzip -o -d %s %s", extractdir, zipfile))
+  system(sprintf("unzip -o -d %s %s", extractdir, zipfile)) # extract to the hidden folder
   }
 
 
