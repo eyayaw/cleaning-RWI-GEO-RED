@@ -19,4 +19,4 @@ The data come with a rich set of property characteristics which enable us to com
 {ln} P_{hit}=\delta_{it} + {X}_{hit}\beta + \varepsilon_{hit} \quad \quad (1)
 \end{align},
 ```
-where $h$ indexes houses, $i$ districts and $t$ years, $P$ price of houses in euros per $m^2$, $\delta_{it}$ denotes district-year fixed effects that are of main interest to estimate, and $X$ includes a set of house characteristics. The estimated intercepts $\widehat{\delta_{it}}$ represent the quality adjusted prices for each district $i$ in every year $t$. After estimating (1) with fixed effects, the hedonic price index is given by $\widehat{\delta_{it}} = ln P_{hit} − X\beta$.
+where $h$ indexes houses, $i$ districts and $t$ years, $P$ price of houses in euros per $m^2$, $\delta_{it}$ denotes district-year fixed effects that are of main interest to estimate, and $X$ includes a set of house characteristics. The estimated intercepts $\widehat{\delta_{it}}$ represent the quality adjusted prices for each district $i$ in every year $t$. After estimating (1) with fixed effects, the hedonic price index is given by $\widehat{\delta_{it}} = ln P_{hit} − X\widehat{\beta}$.
