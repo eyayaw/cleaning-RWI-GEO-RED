@@ -1,7 +1,8 @@
 library(data.table)
 library(haven, include.only = 'read_dta')
-source("script/helpers/base-helpers.R")
-source("script/helpers/utils.R")
+source("helpers/base-helpers.R")
+source("helpers/helpers.R")
+
 # params
 since_when = 2016 # keep observations since
 extract_raw_files = FALSE
@@ -9,8 +10,8 @@ extract_raw_files = FALSE
 # extract if not available
 ## caution: utils::unzip may truncate extraction if the size is > 4GB so don't rely on it
 ## better to do it with the command line or manually with 7zip etc
-zipfile = "../Common-Data/RED_v6.1.zip"
-extractdir = paste0("../Common-Data/.", file.stem(zipfile))
+zipfile = "../RED_v6.1.zip"
+extractdir = paste0("../.", file.stem(zipfile)) # create a hidden folder
 
 if (extract_raw_files) {
   # o for overwrite d for directory
@@ -109,7 +110,7 @@ for (h in seq_along(dlist)) {
   df_suf = do.call(rbind, df_suf)
   df_suf = df_suf[df_suf[[yearvar]] >= since_when, ] # injection
   # make English names
-  var_dict = read.csv("data/variable-and-value_labels/variables-metadata_manually.csv")
+  var_dict = read.csv("variable-and-value_labels/variables-metadata_manually.csv")
   var_names_en = with(var_dict, var_en[match(common_vars_selected, var_de)])
   var_names_en = replace(var_names_en, is.na(var_names_en), common_vars_selected[is.na(var_names_en)])
 
