@@ -10,3 +10,10 @@ Somes of the scripts might not be relevant for your particular use, for example,
 4. [clean_rents.R](clean_rents.R)
 5. [hedonic-model_prices.R](hedonic-model_prices.R)
 6. [hedonic-model_rents.R](hedonic-model_rents.R)
+
+### A note on hedonic index
+
+The data come with a rich set of property characteristics which enable us to compute a hedonic price index to quality-adjust house prices. I construct a mix-adjusted house price index from the following panel hedonic regression
+$$
+\ln P_{hit} = \delta_{it} + \textbold{X}_{hit}\beta + \varepsilon_{hit}
+$$
