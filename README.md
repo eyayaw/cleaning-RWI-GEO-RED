@@ -13,6 +13,10 @@ Somes of the scripts might not be relevant for your particular use, for example,
 
 ### A note on hedonic index
 
-The data come with a rich set of property characteristics which enable us to compute a hedonic price index to quality-adjust house prices. I construct a mix-adjusted house price index from the following panel hedonic regression
-<img src="https://render.githubusercontent.com/render/math?math={\ln P_{hit} = \delta_{it} + \textbold{X}_{hit}\beta + \varepsilon_{hit},}">
-where ℎ indexes houses, 𝑖 districts and 𝑡 years, 𝑃 price of houses in euros per m^2^, 𝛿_𝑖𝑡 denotes district-year fixed effects that are of main interest to estimate, and X includes a set of house characteristics. The estimated intercepts 𝛿 𝑖𝑡̂ represent the quality adjusted prices for each district i in every year 𝑡. After estimating (1) with fixed effects, the hedonic price index is given by 𝛿 i𝑡 ̂ = ln 𝑃 ℎi𝑡 − X𝛽.
+The data come with a rich set of property characteristics which enable us to compute a hedonic (price) index to quality-adjust house prices. I construct a mix-adjusted house price index from the following panel hedonic regression
+```math
+\begin{align}
+{ln} P_{hit}=\delta_{it} + {X}_{hit}\beta + \varepsilon_{hit} 
+\end{align},
+```
+where $h$ indexes houses, $i$ districts and $t$ years, $P$ price of houses in euros per $m^2$, ${\delta_{it}$ denotes district-year fixed effects that are of main interest to estimate, and $X$ includes a set of house characteristics. The estimated intercepts $\widehat{\delta_{it}}$ represent the quality adjusted prices for each district $i$ in every year $t$. After estimating (1) with fixed effects, the hedonic price index is given by $\widehat{\delta_{it}} = ln P_{hit} − X\beta$.
