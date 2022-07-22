@@ -5,7 +5,7 @@ count_missing <- function(df) {
   lapply(df, \(x) sum(x < 0)) |>
     {\(x) data.frame(var = names(x), count = unname(unlist(x)))}()
 }
-GRID_data_path = "../Common-Data/.GRID_v11/Raster_shp/ger_1km_rectangle.shp"
+GRID_data_path = "../.GRID_v11/Raster_shp/ger_1km_rectangle.shp"
 selected = c(
   "uniqueid_gen", "obid", "kid2019", "zipcode", "grid_id", "year", "ad_end_mon",
   "rent_cold", "utilities", "constr_year", "renov_year", "floor_space", "floor",
@@ -257,9 +257,7 @@ rents[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 rm(binary_vars, i, check_for_0)
 
 # keep only districts that are defined in BKG end of the year i.e. 2019.12.31
-districts = fread("../housing-market/data/processed/admin-areas/districts_destasis.csv",
-  select = "did", colClasses = "integer"
-)
+districts = fread("data/processed/districts_destasis.csv",select = "did", colClasses = "integer")
 rents = merge(rents, districts, "did") # two districts c('3152', '3156') will be dropped
 
 if (FALSE) {
@@ -268,7 +266,7 @@ if (FALSE) {
 
 # compute distance to the CBD -----
 grid1km = st_read(GRID_data_path)[, c("idm", "geometry")]
-cbds = st_read('../housing-market/data/processed/geodata/CBDs.shp')[, c('did', 'geometry')]
+cbds = st_read('data/geodata/CBDs.shp')[, c('did', 'geometry')]
 cbds$geometry = st_centroid(cbds[, 'geometry'])$geometry
 cbds = st_transform(cbds, st_crs(grid1km))
 cbds$did = as.integer(cbds$did)
