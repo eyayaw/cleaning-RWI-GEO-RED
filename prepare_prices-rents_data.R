@@ -26,17 +26,17 @@ dlist = c(
   `apartments-sales` = "WK_SUF",
   `apartments-rents` = "WM_SUF"
 )
-chosen_zipfile = paste0(extractdir, "/Stata.zip")
-zips_in_chosen = paste0(extractdir, file.stem(chosen_zipfile), '/', dlist, ".zip")
-if (extract_raw_files & !dir.exists(tools::file_path_sans_ext(chosen_zipfile)))
-  system(sprintf('unzip -o -d %s %s', dirname(chosen_zipfile), chosen_zipfile))
+
+homes_zipfile = paste0(extractdir, "/Stata/", dlist, "_ohneText.zip")
+
 for (zfile in homes_zipfile) {
-  if (extract_raw_files)
+  if (!dir.exists(tools::file_path_sans_ext(zfile))) { # guard against overwriting
     if (file.exists(zfile)) {
       system(sprintf("unzip -o -d %s %s", dirname(zfile), zfile))
     } else {
-        warning(sprintf('The zip file `%s` does not exist, no extraction has been made.', zfile))
-      }
+      warning(sprintf("The zip file `%s` does not exist, no extraction has been made.", zfile))
+    }
+  }
 }
 
 # iterate over homes/apartments for sale (HK_SUF,WK_SUF) and -----
@@ -47,8 +47,8 @@ for (zfile in homes_zipfile) {
 # here chose to work with Stata ohneText data sets
 for (h in seq_along(dlist)) {
   file_list = dir(
-    path = paste0(extractdir, "/Stata/ohneText/", dlist[[h]], "_ohneText/"),
-    pattern = paste0(dlist[[h]], "_ohneText([0-9]+)?[.]dta$"),
+    path = paste0(extractdir, "/Stata/", dlist[[h]], "_ohneText/"),
+    pattern = paste0(dlist[[h]], "_ohneText[0-9]+[.]dta$"),
     full.names = TRUE
   )
   if (length(file_list) == 0) stop('No list of files found.', call. = FALSE)
