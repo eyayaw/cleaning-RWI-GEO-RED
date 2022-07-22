@@ -1,10 +1,10 @@
 library(data.table)
 library(sf)
-source("script/helpers/utils.R")
+source("helpers/helpers.R")
 if (!dir.exists("data/processed/")) {
   dir.create("data/processed")
 }
-GRID_data_path = "../Common-Data/.GRID_v11/Raster_shp/ger_1km_rectangle.shp"
+GRID_data_path = "../.GRID_v11/Raster_shp/ger_1km_rectangle.shp"
 
 # cleaning ---------------------------------------------------------------------
 fpath="data/homes-sales_2016-2021.csv"
@@ -240,7 +240,7 @@ homes_sales = homes_sales[protected_building == 0, ]
 homes_sales[, protected_building := NULL]
 
 # keep only districts that are defined in BKG end of the year i.e. 2019.12.31
-districts = fread('../housing-market/data/processed/admin-areas/districts_destasis.csv',
+districts = fread('data/processed/districts_destasis.csv',
                   select = 'did', colClasses = 'integer')
 homes_sales = merge(homes_sales, districts, 'did') # two districts c('3152', '3156') will be dropped
 
@@ -249,7 +249,7 @@ if (FALSE)
 
 # compute distance to the CBD -----
 grid1km = st_read(GRID_data_path)[, c("idm", "geometry")]
-cbds = st_read('../housing-market/data/processed/geodata/CBDs.shp')[, c('did', 'geometry')]
+cbds = st_read('data/geodata/CBDs.shp')[, c('did', 'geometry')]
 cbds$geometry = st_centroid(cbds[, 'geometry'])$geometry
 cbds = st_transform(cbds, st_crs(grid1km))
 cbds$did = as.integer(cbds$did)
