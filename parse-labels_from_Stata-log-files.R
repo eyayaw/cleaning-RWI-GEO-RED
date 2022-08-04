@@ -20,7 +20,7 @@ get_labels <- function(path) {
   ne = length(index)
   out = vector("list", ne)
   s = 1
-  for (i in 1:ne) {
+  for (i in seq_len(ne)) {
     out[[i]] = c(s, index[[i]] - 1)
     s = index[[i]] + 1
   }
