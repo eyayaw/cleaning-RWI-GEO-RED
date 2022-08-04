@@ -56,12 +56,12 @@ str_remove_all <- function(string, pattern, ...) {
 }
 
 
-starts_with = function(string, pattern, ignore.case = FALSE, ...) {
-  if (anyNA(string)) stop('`string` should not contain any NA', call. = FALSE)
+starts_with = function(string, pattern, ignore.case = F, ...) {
+  if (anyNA(string)) stop('`string` should not contain any NA', call. = F)
   grepl(paste0("^", pattern), string, ignore.case = ignore.case, ...)
 }
-ends_with = function(string, pattern, ignore.case = FALSE, ...) {
-  if (anyNA(string)) stop('`string` should not contain any NA', call. = FALSE)
+ends_with = function(string, pattern, ignore.case = F, ...) {
+  if (anyNA(string)) stop('`string` should not contain any NA', call. = F)
   grepl(paste0(pattern, "$"), string, ignore.case = ignore.case, ...)
 }
 
