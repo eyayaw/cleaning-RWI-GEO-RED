@@ -4,12 +4,12 @@ This repo contains a set of R scripts for cleaning housing data provided by RWI-
 The data cleaning steps I followed in these scripts are ad hoc and thus you may need to adapt them to your need should you find them useful. 
 Somes of the steps in the scripts might not be relevant for your particular use case, for example, extracting the zip files and parsing the variable/value labels, and translating variable names. You may read the scripts in the following order. 
 ## Steps
-1. [parse-labels_from_Stata-log-files.R](parse-labels_from_Stata-log-files.R)
-2. [prepare_prices-rents_data.R](prepare_prices-rents_data.R)
-3. [clean_prices.R](clean_prices.R)
-4. [clean_rents.R](clean_rents.R)
-5. [hedonic-model_prices.R](hedonic-model_prices.R)
-6. [hedonic-model_rents.R](hedonic-model_rents.R)
+1. [parse-labels_from_Stata-log-files.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/parse-labels_from_Stata-log-files.R)
+2. [prepare_prices-rents_data.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/prepare_prices-rents_data.R)
+3. [clean_prices.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_prices.R)
+4. [clean_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R)
+5. [hedonic-model_prices.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_prices.R)
+6. [hedonic-model_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_rents.R)
 
 ### A note on hedonic index
 
