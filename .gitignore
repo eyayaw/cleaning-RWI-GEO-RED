@@ -1,3 +1,5 @@
+.DS_Store
+extra/admin-areas/germany-grid/DE_Grid_ETRS89-LAEA_1km.gpkg/
 # History files
 .Rhistory
 .Rapp.history

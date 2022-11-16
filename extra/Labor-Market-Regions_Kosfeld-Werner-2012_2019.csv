@@ -1,0 +1,402 @@
+amr_id,amr_name,district_id,district_name
+1,Kiel,01002,Kiel
+1,Kiel,01004,Neumünster
+1,Kiel,01057,Plön
+1,Kiel,01058,Rendsburg-Eckernförde
+2,Lübeck,01003,Lübeck
+2,Lübeck,01055,Ostholstein
+3,Dithmarschen,01051,Dithmarschen
+4,Flensburg,01001,Flensburg
+4,Flensburg,01054,Nordfriesland
+4,Flensburg,01059,Schleswig-Flensburg
+5,Hamburg,01053,Herzogtum Lauenburg
+5,Hamburg,01056,Pinneberg
+5,Hamburg,01060,Segeberg
+5,Hamburg,01061,Steinburg
+5,Hamburg,01062,Stormarn
+5,Hamburg,02000,Hamburg
+5,Hamburg,03353,Harburg
+5,Hamburg,03355,Lüneburg
+6,Braunschweig,03101,Braunschweig
+6,Braunschweig,03102,Salzgitter
+6,Braunschweig,03157,Peine
+6,Braunschweig,03158,Wolfenbüttel
+7,Wolfsburg,03103,Wolfsburg
+7,Wolfsburg,03151,Gifhorn
+7,Wolfsburg,03154,Helmstedt
+8,Göttingen,03155,Northeim
+8,Göttingen,16061,Eichsfeld
+9,Goslar,03153,Goslar
+9,Goslar,15085,Harz
+10,Hannover,03241,Hannover
+10,Hannover,03254,Hildesheim
+10,Hannover,03257,Schaumburg
+10,Hannover,03358,Soltau-Fallingbostel
+11,Hameln,03252,Hameln-Pyrmont
+11,Hameln,03255,Holzminden
+12,Celle,03351,Celle
+13,Lüchow-Dannenberg,03354,Lüchow-Dannenberg
+13,Lüchow-Dannenberg,15081,Altmarkkreis Salzwedel
+14,Stade,03359,Stade
+15,Uelzen,03360,Uelzen
+16,Emden,03402,Emden
+16,Emden,03452,Aurich
+16,Emden,03457,Leer
+17,Oldenburg,03403,Oldenburg
+17,Oldenburg,03451,Ammerland
+17,Oldenburg,03458,Oldenburg
+17,Oldenburg,03461,Wesermarsch
+18,Osnabrück,03404,SK Osnabrück
+18,Osnabrück,03459,LK Osnabrück
+19,Emsland,03454,Emsland
+19,Emsland,03456,Grafschaft Bentheim
+20,Wilhelmshaven,03405,Wilhelmshaven
+20,Wilhelmshaven,03455,Friesland
+20,Wilhelmshaven,03462,Wittmund
+21,Vechta,03453,Cloppenburg
+21,Vechta,03460,Vechta
+22,Bremen,03251,Diepholz
+22,Bremen,03356,Osterholz
+22,Bremen,03357,Rotenburg (Wümme)
+22,Bremen,03361,Verden
+22,Bremen,03401,Delmenhorst
+22,Bremen,04011,Bremen
+23,Bremerhaven,03352,Cuxhaven
+23,Bremerhaven,04012,Bremerhaven
+24,Düsseldorf,05111,Düsseldorf
+24,Düsseldorf,05114,Krefeld
+24,Düsseldorf,05116,Mönchengladbach
+24,Düsseldorf,05158,Mettmann
+24,Düsseldorf,05162,Rhein-Kreis Neuss
+24,Düsseldorf,05166,Viersen
+25,Essen,05112,Duisburg
+25,Essen,05113,Essen
+25,Essen,05117,Mülheim an der Ruhr
+25,Essen,05119,Oberhausen
+25,Essen,05170,Wesel
+25,Essen,05512,Bottrop
+26,Wuppertal,05120,Remscheid
+26,Wuppertal,05122,Solingen
+26,Wuppertal,05124,Wuppertal
+27,Kleve,05154,Kleve
+28,Bonn,05314,Bonn
+28,Bonn,05382,Rhein-Sieg-Kreis
+28,Bonn,07131,Ahrweiler
+29,Köln,05315,Köln
+29,Köln,05316,Leverkusen
+29,Köln,05362,Rhein-Erft-Kreis
+29,Köln,05366,Euskirchen
+29,Köln,05378,Rheinisch-Bergischer Kreis
+30,Aachen,05358,Düren
+30,Aachen,05370,Heinsberg
+31,Olpe,05374,Oberbergischer Kreis
+31,Olpe,05966,Olpe
+32,Münster,05515,Münster
+32,Münster,05558,Coesfeld
+32,Münster,05566,Steinfurt
+32,Münster,05570,Warendorf
+33,Borken,05554,Borken
+34,Bielefeld,05711,Bielefeld
+34,Bielefeld,05754,Gütersloh
+34,Bielefeld,05766,Lippe
+35,Höxter,05762,Höxter
+36,Minden,03256,Nienburg (Weser)
+36,Minden,05758,Herford
+36,Minden,05770,Minden-Lübbecke
+37,Bochum,05513,Gelsenkirchen
+37,Bochum,05562,Recklinghausen
+37,Bochum,05911,Bochum
+37,Bochum,05916,Herne
+38,Dortmund,05913,Dortmund
+38,Dortmund,05915,Hamm
+38,Dortmund,05978,Unna
+39,Hagen,05914,Hagen
+39,Hagen,05954,Ennepe-Ruhr-Kreis
+39,Hagen,05962,Märkischer Kreis
+40,Siegen,05970,Siegen-Wittgenstein
+41,Soest,05774,Paderborn
+41,Soest,05958,Hochsauerlandkreis
+41,Soest,05974,Soest
+42,Darmstadt,06411,Darmstadt
+42,Darmstadt,06432,Darmstadt-Dieburg
+42,Darmstadt,06437,Odenwaldkreis
+43,Frankfurt am Main,06412,Frankfurt am Main
+43,Frankfurt am Main,06413,Offenbach am Main
+43,Frankfurt am Main,06433,Groß-Gerau
+43,Frankfurt am Main,06434,Hochtaunuskreis
+43,Frankfurt am Main,06435,Main-Kinzig-Kreis
+43,Frankfurt am Main,06436,Main-Taunus-Kreis
+43,Frankfurt am Main,06438,Offenbach
+43,Frankfurt am Main,06440,Wetteraukreis
+44,Gießen,06531,Gießen
+44,Gießen,06532,Lahn-Dill-Kreis
+44,Gießen,06534,Marburg-Biedenkopf
+45,Limburg-Weilburg,06439,Rheingau-Taunus-Kreis
+45,Limburg-Weilburg,06533,Limburg-Weilburg
+46,Kassel,06611,SK Kassel
+46,Kassel,06633,LK Kassel
+46,Kassel,06634,Schwalm-Eder-Kreis
+46,Kassel,06636,Werra-Meißner-Kreis
+47,Fulda,06535,Vogelsbergkreis
+47,Fulda,06631,Fulda
+47,Fulda,06632,Hersfeld-Rotenburg
+48,Waldeck-Frankenberg,06635,Waldeck-Frankenberg
+49,Koblenz,07111,Koblenz
+49,Koblenz,07135,Cochem-Zell
+49,Koblenz,07137,Mayen-Koblenz
+49,Koblenz,07138,Neuwied
+49,Koblenz,07140,Rhein-Hunsrück-Kreis
+49,Koblenz,07141,Rhein-Lahn-Kreis
+49,Koblenz,07143,Westerwaldkreis
+50,Altenkirchen,07132,Altenkirchen (Westerwald)
+51,Bad Kreuznach,07133,Bad Kreuznach
+51,Bad Kreuznach,07134,Birkenfeld
+52,Bitburg,07232,Eifelkreis Bitburg-Prüm
+53,Vulkaneifel,07233,Daun Vulkaneifel
+54,Trier,07211,Trier
+54,Trier,07231,Bernkastel-Wittlich
+54,Trier,07235,Trier-Saarburg
+55,Kaiserslautern,07312,SK Kaiserslautern
+55,Kaiserslautern,07333,Donnersbergkreis
+55,Kaiserslautern,07335,LK Kaiserslautern
+55,Kaiserslautern,07336,Kusel
+56,Landau,07313,Landau in der Pfalz
+56,Landau,07334,Germersheim
+56,Landau,07337,Südliche Weinstraße
+57,Ludwigshafen,07311,Frankenthal (Pfalz)
+57,Ludwigshafen,07314,Ludwigshafen am Rhein
+57,Ludwigshafen,07316,Neustadt an der Weinstraße
+57,Ludwigshafen,07318,Speyer
+57,Ludwigshafen,07319,Worms
+57,Ludwigshafen,07332,Bad Dürkheim
+57,Ludwigshafen,07338,Rhein-Pfalz-Kreis
+57,Ludwigshafen,08222,Mannheim
+58,Mainz,06414,Wiesbaden
+58,Mainz,07315,Mainz
+58,Mainz,07331,Alzey-Worms
+58,Mainz,07339,Mainz-Bingen
+59,Stuttgart,08111,Stuttgart
+59,Stuttgart,08116,Esslingen
+59,Stuttgart,08118,Ludwigsburg
+59,Stuttgart,08119,Rems-Murr-Kreis
+60,Böblingen,08115,Böblingen
+60,Böblingen,08235,Calw
+60,Böblingen,08237,Freudenstadt
+61,Göppingen,08117,Göppingen
+62,Heilbronn,08121,SK Heilbronn
+62,Heilbronn,08125,LK Heilbronn
+62,Heilbronn,08126,Hohenlohekreis
+62,Heilbronn,08225,Neckar-Odenwald-Kreis
+63,Schwäbisch Hall,08127,Schwäbisch Hall
+64,Heidenheim,08135,Heidenheim Landkreis
+64,Heidenheim,08136,Ostalbkreis
+64,Heidenheim,09773,Dillingen an der Donau
+65,Karlsruhe,08211,Baden-Baden
+65,Karlsruhe,08212,SK Karlsruhe
+65,Karlsruhe,08215,LK Karlsruhe
+65,Karlsruhe,08216,Rastatt
+66,Heidelberg,06431,Bergstraße
+66,Heidelberg,08221,Heidelberg
+66,Heidelberg,08226,Rhein-Neckar-Kreis
+67,Pforzheim,08231,Pforzheim
+67,Pforzheim,08236,Enzkreis
+68,Freiburg,08311,Freiburg im Breisgau
+68,Freiburg,08315,Breisgau-Hochschwarzwald
+68,Freiburg,08316,Emmendingen
+69,Ortenaukreis,08317,Ortenaukreis
+70,Rottweil,08325,Rottweil
+70,Rottweil,08326,Schwarzwald-Baar-Kreis
+70,Rottweil,08327,Tuttlingen
+71,Konstanz,08335,Konstanz
+72,Lörrach,08336,Lörrach
+73,Waldshut,08337,Waldshut
+74,Reutlingen,08415,Reutlingen
+74,Reutlingen,08416,Tübingen
+75,Zollernalbkreis,08417,Zollernalbkreis
+76,Ulm,08421,Ulm
+76,Ulm,08425,Alb-Donau-Kreis
+76,Ulm,09774,Günzburg
+76,Ulm,09775,Neu-Ulm
+77,Ravensburg,08426,Biberach
+77,Ravensburg,08435,Bodenseekreis
+77,Ravensburg,08436,Ravensburg
+77,Ravensburg,09776,Lindau (Bodensee)
+78,Sigmaringen,08437,Sigmaringen
+79,Ingolstadt,09161,Ingolstadt
+79,Ingolstadt,09176,Eichstätt
+79,Ingolstadt,09185,Neuburg-Schrobenhausen
+79,Ingolstadt,09186,Pfaffenhofen an der Ilm
+80,München,09162,SK München
+80,München,09173,Bad Tölz-Wolfratshausen
+80,München,09174,Dachau
+80,München,09175,Ebersberg
+80,München,09177,Erding
+80,München,09178,Freising
+80,München,09179,Fürstenfeldbruck
+80,München,09181,Landsberg am Lech
+80,München,09182,Miesbach
+80,München,09184,LK München
+80,München,09188,Starnberg
+81,Altötting,09171,Altötting
+81,Altötting,09183,Mühldorf am Inn
+81,Altötting,09277,Rottal-Inn
+82,Traunstein,09163,Rosenheim
+82,Traunstein,09172,Berchtesgadener Land
+82,Traunstein,09187,Rosenheim
+82,Traunstein,09189,Traunstein
+83,Weilheim-Schongau,09180,Garmisch-Partenkirchen
+83,Weilheim-Schongau,09190,Weilheim-Schongau
+84,Deggendorf,09271,Deggendorf
+84,Deggendorf,09276,Regen
+85,Freyung-Grafenau,09272,Freyung-Grafenau
+86,Passau,09262,SK Passau
+86,Passau,09275,LK Passau
+87,Landshut,09261,SK Landshut
+87,Landshut,09263,Straubing
+87,Landshut,09274,LK Landshut
+87,Landshut,09278,Straubing-Bogen
+87,Landshut,09279,Dingolfing-Landau
+88,Cham,09372,Cham
+89,Amberg,09361,Amberg
+89,Amberg,09363,Weiden in der Oberpfalz
+89,Amberg,09371,Amberg-Sulzbach
+89,Amberg,09374,Neustadt an der Waldnaab
+89,Amberg,09377,Tirschenreuth
+90,Regensburg,09273,Kelheim
+90,Regensburg,09362,SK Regensburg
+90,Regensburg,09375,LK Regensburg
+90,Regensburg,09376,Schwandorf
+91,Bamberg,09461,SK Bamberg
+91,Bamberg,09471,LK Bamberg
+91,Bamberg,09674,Haßberge
+92,Bayreuth,09462,SK Bayreuth
+92,Bayreuth,09472,LK Bayreuth
+92,Bayreuth,09477,Kulmbach
+93,Coburg,09463,SK Coburg
+93,Coburg,09473,LK Coburg
+93,Coburg,09478,Lichtenfels
+93,Coburg,16072,Sonneberg
+94,Hof,09464,SK Hof
+94,Hof,09475,LK Hof
+94,Hof,09479,Wunsiedel im Fichtelgebirge
+94,Hof,14523,Vogtlandkreis
+95,Kronach,09476,Kronach
+96,Erlangen,09474,Forchheim
+96,Erlangen,09562,Erlangen
+96,Erlangen,09572,Erlangen-Höchstadt
+96,Erlangen,09575,Neustadt an der Aisch-Bad Windsheim
+97,Nürnberg,09373,Neumarkt in der Oberpfalz
+97,Nürnberg,09563,Fürth
+97,Nürnberg,09564,Nürnberg
+97,Nürnberg,09565,Schwabach
+97,Nürnberg,09573,Fürth
+97,Nürnberg,09574,Nürnberger Land
+97,Nürnberg,09576,Roth
+98,Ansbach,09561,SK Ansbach
+98,Ansbach,09571,LK Ansbach
+99,Weißenburg-Gunzenhausen,09577,Weißenburg-Gunzenhausen
+100,Aschaffenburg,09661,SK Aschaffenburg
+100,Aschaffenburg,09671,LK Aschaffenburg
+100,Aschaffenburg,09676,Miltenberg
+101,Schweinfurt,09662,SK Schweinfurt
+101,Schweinfurt,09672,Bad Kissingen
+101,Schweinfurt,09673,Rhön-Grabfeld
+101,Schweinfurt,09678,LK Schweinfurt
+102,Würzburg,08128,Main-Tauber-Kreis
+102,Würzburg,09663,SK Würzburg
+102,Würzburg,09675,Kitzingen
+102,Würzburg,09677,Main-Spessart
+102,Würzburg,09679,LK Würzburg
+103,Augsburg,09761,SK Augsburg
+103,Augsburg,09771,Aichach-Friedberg
+103,Augsburg,09772,LK Augsburg
+104,Memmingen,09764,Memmingen
+104,Memmingen,09778,Unterallgäu
+105,Donau-Ries,09779,Donau-Ries
+106,Kempten,09762,Kaufbeuren
+106,Kempten,09763,Kempten (Allgäu)
+106,Kempten,09777,Ostallgäu
+106,Kempten,09780,Oberallgäu
+107,Saarbrücken,10041,Saarbrücken
+107,Saarbrücken,10042,Merzig-Wadern
+107,Saarbrücken,10043,Neunkirchen
+107,Saarbrücken,10044,Saarlouis
+107,Saarbrücken,10046,St. Wendel
+108,Pirmasens,07317,Pirmasens
+108,Pirmasens,07320,Zweibrücken
+108,Pirmasens,07340,Südwestpfalz
+108,Pirmasens,10045,Saarpfalz-Kreis
+109,Berlin,11000,Berlin
+109,Berlin,12054,Potsdam
+109,Berlin,12060,Barnim
+109,Berlin,12061,Dahme-Spreewald
+110,Frankfurt (Oder),12053,Frankfurt (Oder)
+110,Frankfurt (Oder),12067,Oder-Spree
+111,Elbe-Elster,12062,Elbe-Elster
+111,Elbe-Elster,12066,Oberspreewald-Lausitz
+112,Havelland,12063,Havelland
+113,Märkisch-Oderland,12064,Märkisch-Oderland
+114,Oberhavel,12065,Oberhavel
+115,Ostprignitz-Ruppin,12068,Ostprignitz-Ruppin
+116,Potsdam-Mittelmark,12051,Brandenburg an der Havel
+116,Potsdam-Mittelmark,12069,Potsdam-Mittelmark
+117,Prignitz,12070,Prignitz
+118,Cottbus,12052,Cottbus
+118,Cottbus,12071,Spree-Neiße
+119,Teltow-Fläming,12072,Teltow-Fläming
+120,Uckermark,12073,Uckermark
+126,Chemnitz,14511,Chemnitz
+126,Chemnitz,14521,Erzgebirgskreis
+126,Chemnitz,14522,Mittelsachsen
+126,Chemnitz,14524,Zwickau
+127,Dresden,14612,Dresden
+127,Dresden,14627,Meißen
+127,Dresden,14628,Sächsische Schweiz-Osterzgebirge
+128,Bautzen,14625,Bautzen
+128,Bautzen,14626,Görlitz
+129,Leipzig,14713,SK Leipzig
+129,Leipzig,14729,LK Leipzig
+129,Leipzig,14730,Nordsachsen
+130,Dessau-Roßlau,15001,Dessau-Roßlau
+130,Dessau-Roßlau,15082,Anhalt-Bitterfeld
+130,Dessau-Roßlau,15091,Wittenberg
+131,Magdeburg,15003,Magdeburg
+131,Magdeburg,15083,Börde
+131,Magdeburg,15086,Jerichower Land
+131,Magdeburg,15089,Salzlandkreis
+132,Halle,15002,Halle(Saale)
+132,Halle,15084,Burgenlandkreis
+132,Halle,15087,Mansfeld-Südharz
+132,Halle,15088,Saalekreis
+133,Stendal,15090,Stendal
+134,Erfurt,16051,Erfurt
+134,Erfurt,16055,Weimar
+134,Erfurt,16067,Gotha
+134,Erfurt,16068,Sömmerda
+134,Erfurt,16070,Ilm-Kreis
+134,Erfurt,16071,Weimarer Land
+135,Gera,16052,Gera
+135,Gera,16076,Greiz
+135,Gera,16077,Altenburger Land
+136,Jena,16053,Jena
+136,Jena,16074,Saale-Holzland-Kreis
+137,Nordhausen,16062,Nordhausen
+137,Nordhausen,16065,Kyffhäuserkreis
+138,Eisenach,16056,Eisenach
+138,Eisenach,16063,Wartburgkreis
+139,Unstrut-Hainich,16064,Unstrut-Hainich-Kreis
+140,Suhl,16054,Suhl
+140,Suhl,16066,Schmalkalden-Meiningen
+140,Suhl,16069,Hildburghausen
+141,Saalfeld-Rudolstadt,16073,Saalfeld-Rudolstadt
+141,Saalfeld-Rudolstadt,16075,Saale-Orla-Kreis
+8,Göttingen,03159,Göttingen
+30,Aachen,05334,Städteregion Aachen
+123,Rostock,13003,Rostock
+121,Schwerin,13004,Schwerin
+122,Mecklenburgische Seenplatte,13071,Mecklenburgische Seenplatte
+123,Rostock,13072,Rostock Landkreis
+121,Schwerin,13076,Ludwigslust-Parchim
+121,Schwerin,13074,Nordwestmecklenburg
+124,Nordvorpommern,13073,Vorpommern-Rügen
+125,Südvorpommern,13075,Vorpommern-Greifswald

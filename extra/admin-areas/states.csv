@@ -1,0 +1,17 @@
+state_code,state_name,state_abb
+01,Schleswig-Holstein,SH
+02,Hamburg,HH
+03,Niedersachsen,NI
+04,Bremen,HB
+05,Nordrhein-Westfalen,NW
+06,Hessen,HE
+07,Rheinland-Pfalz,RP
+08,Baden-Württemberg,BW
+09,Bayern,BY
+10,Saarland,SL
+11,Berlin,BE
+12,Brandenburg,BB
+13,Mecklenburg-Vorpommern,MV
+14,Sachsen,SN
+15,Sachsen-Anhalt,ST
+16,Thüringen,TH
