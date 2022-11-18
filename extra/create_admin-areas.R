@@ -46,16 +46,37 @@ fpath = sprintf('%s/%s/dokumentation/struktur_und_attribute_vg250.xls',dname, fi
 dname = sprintf('%s/%s', dname, file_stem(zfpath)) # the extracted folder
 
 ## States, Bundesländer ---------------------
-# source:https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Glossar/bundeslaender.html
-stats = read.csv("extra/admin-areas/states.csv")
+# source: https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Glossar/bundeslaender.html
+
+states = read.table(
+text =
+"state_code state_name state_abb
+01 Schleswig-Holstein (SH)
+02 Hamburg (HH)
+03 Niedersachsen (NI)
+04 Bremen (HB)
+05 Nordrhein-Westfalen (NW)
+06 Hessen (HE)
+07 Rheinland-Pfalz (RP)
+08 Baden-Württemberg (BW)
+09 Bayern (BY)
+10 Saarland (SL)
+11 Berlin (BE)
+12 Brandenburg (BB)
+13 Mecklenburg-Vorpommern (MV)
+14 Sachsen (SN)
+15 Sachsen-Anhalt (ST)
+16 Thüringen (TH)",
+  header = TRUE, row.names = NULL
+)
 
 
 ## Geographic grids for Germany in Lambert projection (GeoGitter Inspire) ----
-
 grid_furl = "https://daten.gdz.bkg.bund.de/produkte/sonstige/geogitter/aktuell/DE_Grid_ETRS89-LAEA_1km.gpkg.zip"
 grid_dname = 'extra/admin-areas/germany-grid'
 grid_zfpath = sprintf('%s/%s', grid_dname, basename(grid_furl))
 dir.create(grid_dname, showWarnings = FALSE)
+
 try(download_file(grid_furl, grid_zfpath))
 suppressWarnings(unzip(grid_zfpath, exdir = grid_dname, overwrite = FALSE))
 
@@ -65,6 +86,8 @@ de_grid$grid_id = sub('1km[NS](\\d{4})[EW](\\d{4})', "\\2_\\1", de_grid$id)
 st_geometry(de_grid) = 'geometry'
 de_grid = de_grid[, c('grid_id', 'geometry')]
 
+st_write(de_grid, 'data/geodata/germany-grid/de-grid.gpkg', append=FALSE)
+unlink(tools::file_path_sans_ext(grid_zfpath),recursive=TRUE)
 
 # Cleaning ---------------------------------------------------------------
 
@@ -141,16 +164,12 @@ names(municipality_shape) = tolower(names(municipality_shape))
 municipality_shape = subset(municipality_shape, gf == 4L, select = c("ars", 'geometry'))
 municipality_shape = merge(municipality_shape, municipals, 'ars')
 
-## aggregate to the district and state levels
+## aggregate to the district levels
 district_shape = aggregate(
   municipality_shape[, "geometry"],
   list(did = municipality_shape$did), length
 ) |>
   merge(districts[, .(did, name, state)])
-
-state_shape = aggregate(district_shape[, "geometry"],
-  list(state = district_shape$state), length
-)
 
 
 ### add municipality info to the grid--via spatial join ------------------------
@@ -163,6 +182,7 @@ de_grid = de_grid[, c("grid_id", "ars", "ags", "geo_name", "did", "district_name
 ## admin area names, codes
 fwrite(municipals, 'extra/admin-areas/municipalities_bkg.csv')
 fwrite(districts, 'extra/admin-areas/districts_bkg.csv')
+fwrite(states, 'extra/admin-areas/states.csv')
 
 ## admin area shapes
 st_write(municipality_shape, "extra/admin-areas/municipalities_bkg.gpkg", append = FALSE)
