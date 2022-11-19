@@ -1,46 +1,42 @@
 library(data.table)
 library(sf)
 
+# count missing values, which are flagged by any negative number
 count_missing <- function(df) {
   lapply(df, \(x) sum(x < 0)) |>
     {\(x) data.frame(var = names(x), count = unname(unlist(x)))}()
 }
-GRID_data_path = "../.GRID_v11/Raster_shp/ger_1km_rectangle.shp"
-selected = c(
-  "uniqueid_gen", "obid", "kid2019", "zipcode", "grid_id", "year", "ad_end_mon",
-  "rent_cold", "utilities", "constr_year", "renov_year", "floor_space", "floor",
-  "num_floors","num_rooms", "num_bedrooms", "num_bathrooms", "num_ancillary_rooms",
-  "kitchen","condition", "balcony", "garden", "basement", "equipment", "heating_type",
-  "type","house_type", "flat_type", "lab_mrkt_reg", "guest_washroom", "number_hits_of_ad"
-)
 
-rent_homes = fread("data/homes-rents_2016-2021.csv")
-rent_aparts = fread("data/apartments-rents_2016-2021.csv")
+rents_homes = fread("data/homes-rents_2016-2021.csv")
+rents_aparts = fread("data/apartments-rents_2016-2021.csv")
 
 # rm duplicates
-nrh = nrow(rent_homes)
-idx = rent_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rent_homes = rent_homes[idx, ]
-nrow(rent_homes)/nrh
-rent_homes[, spell := NULL]
+nrh = nrow(rents_homes)
+idx = rents_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
+rents_homes = rents_homes[idx, ]
+message(sprintf("%.2f%% were duplicates.", 100-100*nrow(rents_homes)/nrh))
+rents_homes[, spell := NULL]
 rm(idx)
 
-nra = nrow(rent_aparts)
-idx = rent_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rent_aparts = rent_aparts[idx, ]
-nrow(rent_aparts)/nra
-rent_aparts[, spell := NULL]
+nra = nrow(rents_aparts)
+idx = rents_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
+rents_aparts = rents_aparts[idx, ]
+message(sprintf("%.2f%% were duplicates.", 100-100*nrow(rents_aparts)/nra))
+rents_aparts[, spell := NULL]
 rm(idx)
 
 
 # how to combine houses and flats?
-special_code = 99L # by construction
-rent_homes[, flat_type := special_code]
-rent_aparts[, house_type := special_code]
-rent_homes[, plot_size := NULL]  # does not exist for apartments
-rent_aparts[, rent_warm := NULL] # does not exist for homes
+# assign a special value for vars that do not apply to one or another (flats/homes)
+not4Homes = setdiff(names(rents_aparts), names(rents_homes))
+not4Aparts = setdiff(names(rents_homes), names(rents_aparts))
+special_code = 999L # by construction
 
-rents = rbindlist(list(rent_homes, rent_aparts), use.names = TRUE, fill = TRUE)
+rents_homes[, (not4Homes) := special_code]
+rents_aparts[, (not4Aparts) := special_code]
+rents = rbindlist(list(rents_homes, rents_aparts), use.names=TRUE)
+
+rents = rbindlist(list(rents_homes, rents_aparts), use.names = TRUE, fill = TRUE)
 if (!("grid_id" %in% names(rents))) {
   if ("ergg_1km" %in% names(rents)) {
     setnames(rents, "ergg_1km", "grid_id")
@@ -48,24 +44,30 @@ if (!("grid_id" %in% names(rents))) {
     setnames(rents, "grid_id_char", "grid_id")
   }
 }
-# explicit nas - do not apply to one or another (flat/home)
-## usually these are c("floor", "elevator", "balcony", "public_housing_cert", "garden")
-explicit_nas = with(
-  list(x = names(rent_homes), y = names(rent_aparts)),
-  setdiff(union(x, y), intersect(x, y))
+# reorder variables
+order_of_vars = c(
+  "uniqueid_gen", "obid", "kid2019", "zipcode", "grid_id", "year", "ad_end_mon",
+  "rent_cold", "utilities", "constr_year", "renov_year", "floor_space", "floor",
+  "num_floors","num_rooms", "num_bedrooms", "num_bathrooms", "num_ancillary_rooms",
+  "kitchen","condition", "balcony", "garden", "basement", "equipment", "heating_type",
+  "type","house_type", "flat_type", "lab_mrkt_reg", "guest_washroom", "number_hits_of_ad"
 )
-rents[, (explicit_nas) := lapply(.SD, \(x) nafill(x, fill=0)), .SDcols=explicit_nas]
-rents = rents[, ..selected]
+
+setcolorder(rents, order_of_vars)
 setnames(rents, "kid2019", "did")
 setnames(rents, "rent_cold", "rent")
-rents = rents[grid_id > 0 & zipcode > 0 & rent > 0 & floor_space > 0 &
-  num_rooms > 0 & utilities > 0, ]
-rm(rent_homes, rent_aparts)
 
 
-## cleaning
+
+# cleaning -----
+(missings = count_missing(rents) |> {\(x) x[order(-x$count), ]}())
+
+## dealing with missing values of many forms -----------------------------------
+n = nrow(rents)
+rents = rents[grid_id > 0 & rent > 0 & floor_space > 0 & num_rooms > 0 & utilities > 0, ]
+message(sprintf("%.2f%% observations dropped", 100-100*nrow(rents)/n))
+
 ### house type ----
-
 rents[, `:=`(house_type = fcase(
   house_type == -7 | house_type == -9, 0L,
   house_type == 1 | house_type == 2, 1L,
@@ -86,7 +88,7 @@ rents[, house_type := factor(
     "terraced", # 4 terraced + 5 terraced (middle unit) + 6 terraced (end unit)
     "other", # 13 other property for living + 15 other
     "special", # 7 Bungalow + 8 Farmhouse + 9 Castle + 10 Mansion + 14 Special property
-    "apartments"
+    "apartments" # 0-6 are for homes, `special_code` is for flats (WM_SUF)--a special type by construction
   )
 )]
 
@@ -100,21 +102,19 @@ rents[, flat_type := factor(
     "attic", #  1 Attic flat
     "ground-floor", #  2 Ground floor flat
     "flat", #  3 Flat
-    "raised-ground-floor", #  4 Raised ground florr flat
+    "raised-ground-floor", #  4 Raised ground floor flat
     "loft", #  5 Loft
     "Maisonette", #  6 Maisonette
     "penthouse", #  7 Penthouse
     "souterrain", #  8 Souterrain
     "flat-with-terrace", #  9 Flat with terrace
     "others", # 10
-    "houses" # added from houses for rent (HM_SUF)
+    "houses" # 0-10 are for flats, `special_code` is for houses (HM_SUF)--a special type by construction
   )
 )]
 
 
-
 ### condition of the object ----
-
 rents[condition < 0, condition := 0L]
 rents[, condition := factor(
   condition,
@@ -128,13 +128,11 @@ rents[, condition := factor(
 
 
 ### number of bedrooms ----
-
 rents[, num_bedrooms := fcase(
   num_bedrooms <= 0, 0L,
   num_bedrooms >= 7, 7L,
   rep_len(TRUE, length(num_bedrooms)), num_bedrooms
 )]
-
 rents[, num_bedrooms := factor(
   num_bedrooms,
   0:7,
@@ -143,13 +141,11 @@ rents[, num_bedrooms := factor(
 
 
 ### number of bathrooms ----
-
 rents[, num_bathrooms := fcase(
   num_bathrooms <= 0, 0L,
   num_bathrooms >= 4, 4L,
   rep_len(TRUE, length(num_bathrooms)), num_bathrooms
 )]
-
 rents[, num_bathrooms := factor(
   num_bathrooms,
   0:4,
@@ -163,10 +159,9 @@ rents[, num_floors := fcase(
   between(num_floors, 4, max(num_floors)), 4L,
   rep_len(TRUE, length(num_floors)), num_floors
 )]
-
 rents[, num_floors := factor(num_floors, 0:4, c("na", 1:3, "4+"))]
 
-### facilities of the house, create categories ----
+### facilities of the house, create 5 categories ----
 rents[between(equipment, -11, 0), equipment := 0]
 rents[, equipment := factor(
   equipment,
@@ -174,7 +169,9 @@ rents[, equipment := factor(
   c("na", "Simple", "Normal", "Sophisticated", "Deluxe")
 )]
 
-### year of construction, year of renovation ----
+
+### year of construction, and year of renovation ----
+maxYear = max(rents$year)
 rents[, c("constr_year_cat", "renov_year_cat") := lapply(.SD, function(x) {
   fcase(
     x <= 0, 0,
@@ -186,7 +183,7 @@ rents[, c("constr_year_cat", "renov_year_cat") := lapply(.SD, function(x) {
     between(x, 1980, 1989), 6,
     between(x, 1990, 1999), 7,
     between(x, 2000, 2009), 8,
-    between(x, 2010, 2020), 9
+    between(x, 2010, maxYear), 9
   )
 }), .SDcols = c("constr_year", "renov_year")]
 
@@ -195,15 +192,14 @@ rents[, c("constr_year_cat", "renov_year_cat") := lapply(.SD,
   levels = 0:9,
   labels = c(
     "na", "<1900", "1900-1945", "1946-1959", "1960-1969", "1970-1979",
-    "1980-1989", "1990-1999", "2000-2009", "2009+"
+    "1980-1989", "1990-1999", "2000-2009", "2010+"
   )
 ), .SDcols = c("constr_year_cat", "renov_year_cat")]
 
 
 ### Type of heating ----
 rents[heating_type < 0, heating_type := 0]
-# heating_type_labs = get_value_labels('heating_type', TRUE)
-# datapasta::vector_paste(heating_type_labs$label)
+# get_value_labels('heizungsart', TRUE) |> subset(value>=0, )
 rents[, heating_type := factor(
   heating_type,
   0L:13L,
@@ -220,8 +216,10 @@ rents[, heating_type := factor(
 # Following ('Klick & Schaffner' 2019, p. 12), for binary variables, we replace
 # missing values by 0, i.e., by absence of the feature. Absence is denoted by `Nein` (== no ==0) in binary variables.
 
-binary_vars = c("basement", "elevator", "guest_washroom", "balcony", "kitchen",
-                "foerderung", "betreut", "garden")
+binary_vars = c(
+  "basement", "protected_building", "guest_washroom", "holiday_house",
+  "elevator", "balcony", "kitchen", "public_housing_cert", "betreut", "garden"
+)
 
 binary_vars = binary_vars[binary_vars %in% names(rents)]
 
@@ -256,34 +254,35 @@ rents[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 # house keeping
 rm(binary_vars, i, check_for_0)
 
-# keep only districts that are defined in BKG end of the year i.e. 2019.12.31
-districts = fread("data/processed/districts_destasis.csv",select = "did", colClasses = "integer")
-rents = merge(rents, districts, "did") # two districts c('3152', '3156') will be dropped
 
-if (FALSE) {
-  message(sprintf("%.2f%% of the observations dropped.", 100 * rents[, .N] / fread(fpath)[, .N]))
-}
+# drop districts that do not exist under the BKG (2019.12.31) definition, if any
+districts = fread("extra/admin-areas/admin-areas/districts_bkg.csv", select = "did")
+rents = merge(rents, districts, 'did')
+rm(districts)
 
 # compute distance to the CBD -----
-grid1km = st_read(GRID_data_path)[, c("idm", "geometry")]
-cbds = st_read('data/geodata/CBDs.shp')[, c('did', 'geometry')]
-cbds$geometry = st_centroid(cbds[, 'geometry'])$geometry
-cbds = st_transform(cbds, st_crs(grid1km))
-cbds$did = as.integer(cbds$did)
-
+de_grid = st_read('extra/admin-areas/germany-grid/de-grid.gpkg')
+lmrs = fread(
+  "extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.csv",
+  select = c("amr_id", "district_id"),
+  col.names = c("amr_id", "did")
+)
+cbds = st_read('extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.gpkg')[, c('amr_id', 'geom')] |> st_centroid(cbds)
+cbds = st_transform(cbds, st_crs(de_grid))
+cbds = merge(cbds, lmrs, 'amr_id')
+rm(lmrs)
 # geometry now is the centroid of the grid cell
-grid1km$geometry = st_centroid(grid1km[, 'geometry'])$geometry
-names(grid1km)[names(grid1km) == 'idm'] = 'grid_id'
-grid1km = merge(grid1km, unique(rents[, .(grid_id, did)]), by="grid_id")
+st_geometry(de_grid) = st_centroid(st_geometry(de_grid)) |> st_geometry()
+de_grid = merge(de_grid, unique(rents[, .(grid_id, did)]), by="grid_id")
 
-dids = unique(cbds$did)
+dids = as.integer(unique(cbds$did))
 dist2cbd = vector("list", length(dids))
 for (did in dids) {
-  grid_ids = which(grid1km$did == did)
+  grid_ids = which(as.integer(de_grid$did) == did)
   dist2cbd[[did]] = data.frame(
-    grid_id = grid1km[grid_ids, ]$grid_id,
+    grid_id = de_grid[grid_ids, ]$grid_id,
     did = did,
-    dist2cbd = st_distance(grid1km[grid_ids, ], cbds[cbds$did == did, ])
+    dist2cbd = st_distance(de_grid[grid_ids, ], cbds[as.integer(cbds$did) == did, ])
   )
 }
 dist2cbd = rbindlist(dist2cbd, use.names = TRUE)
@@ -318,13 +317,10 @@ setkeyv(rents, c("did", "zipcode", "ad_end_mon", "year"))
 rents[constr_year < 0, constr_year := NA][renov_year < 0, renov_year := NA]
 
 # perhaps houses not finished or built yet
-max_year = rents[, max(year)] # min(2021, rents[, max(year)])
-rents[constr_year > max_year, constr_year := (max_year)]
+maxYear = rents[, max(year)] # min(2021, rents[, max(year)])
+rents[constr_year > maxYear, constr_year := (maxYear)]
 # If renovated before built, swap construction year with renovation year
-rents[
-  renov_year < constr_year,
-  `:=`(renov_year = constr_year, constr_year = renov_year)
-]
+rents[renov_year < constr_year,`:=`(renov_year = constr_year, constr_year = renov_year)]
 
 # keep houses built since 1900
 rents = rents[constr_year >= 1900 | is.na(constr_year), ]
@@ -361,14 +357,14 @@ if (any(idx <- rents[, constr_year < 1900])) {
   rents = rents[!idx, ]
 }
 
-if (any(rents[, renov_year > max_year])) {
+if (any(rents[, renov_year > maxYear])) {
   message("The imputation produced for some homes renov.year > max.year possible.\
           Replaced them by the max.year")
-  rents[renov_year > max_year, renov_year := (max_year)]
+  rents[renov_year > maxYear, renov_year := (maxYear)]
 }
 
 # compute age of houses, and renovation speed
-rents[, age0 := max_year - constr_year]
+rents[, age0 := maxYear - constr_year]
 rents[, age1 := renov_year - constr_year]
 
 # drop not-finished houses: House in process of planning or building
@@ -383,10 +379,7 @@ rents = rents[exp(lnrent_sqm) >= 1 & exp(lnrent_sqm) <= 50 & floor_space >= 30 &
 nrow(rents)/n
 
 # write to disk ----
-if (file.exists("data/processed/rent_homes-apartments_ready.csv")) {
+if (file.exists("data/processed/rents_homes-apartments_ready.csv")) {
   warning("File has been overwritten!", call. = FALSE)
-  fwrite(rents, "data/processed/rent_homes-apartments_ready.csv")
-} else{
-  fwrite(rents, "data/processed/rent_homes-apartments_ready.csv")
 }
-if (FALSE) haven::write_dta(rents, "data/processed/rent_homes-apartments_ready.dta")
+fwrite(rents, "data/processed/rents_homes-apartments_ready.csv")
