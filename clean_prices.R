@@ -269,7 +269,7 @@ rm(districts)
 
 
 # compute distance to the CBD -----
-de_grid = st_read('data/geodata/germany-grid/de-grid.gpkg')
+de_grid = st_read('extra/admin-areas/germany-grid/de-grid.gpkg')
 lmrs = fread(
   "extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.csv",
   select = c("amr_id", "district_id"),
