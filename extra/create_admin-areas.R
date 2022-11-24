@@ -33,7 +33,7 @@ file_stem <- function(path) {
 ### It is based on the territorial definition of 2019 (end of the year).
 
 furl = 'https://daten.gdz.bkg.bund.de/produkte/vg/vg250_kompakt_1231/2019/vg250_12-31.utm32s.shape.kompakt.zip'
-dname = 'extra/admin-areas/'
+dname = 'extra/admin-areas'
 dir.create(dname, showWarnings = FALSE)
 zfpath = sprintf('%s/%s', dname, basename(furl))
 
@@ -67,7 +67,8 @@ text =
 14 Sachsen (SN)
 15 Sachsen-Anhalt (ST)
 16 Thüringen (TH)",
-  header = TRUE, row.names = NULL
+  header = TRUE, row.names = NULL,
+  colClasses = rep("character", 3) # prevent coercing state_code to integer (which removes trailing 0)
 )
 
 
@@ -86,7 +87,7 @@ de_grid$grid_id = sub('1km[NS](\\d{4})[EW](\\d{4})', "\\2_\\1", de_grid$id)
 st_geometry(de_grid) = 'geometry'
 de_grid = de_grid[, c('grid_id', 'geometry')]
 
-st_write(de_grid, 'data/geodata/germany-grid/de-grid.gpkg', append=FALSE)
+st_write(de_grid, 'extra/admin-areas/germany-grid/de-grid.gpkg', append=FALSE)
 unlink(tools::file_path_sans_ext(grid_zfpath),recursive=TRUE)
 
 # Cleaning ---------------------------------------------------------------
@@ -134,7 +135,7 @@ districts = districts[, .(did, name, state, admin_unit=paste0(admin_unit,"-", be
 districts = districts[states[, c('state_code', 'state_abb')], on = 'state==state_code'][, !'state']
 
 setnames(districts, 'state_abb', 'state')
-setcolorder(districts, 'state', after = 'name')
+setcolorder(districts, neworder=c('name', 'state'))
 
 ### municipalities ----
 municipals = admin_areas[admin_level == 6L,
@@ -145,7 +146,7 @@ municipals = admin_areas[admin_level == 6L,
 
 # merge with the districts data.frame for district id and name
 municipals = municipals[districts[, .(did, district_name = name, state)], on='did']
-setcolorder(municipals, c('district_name', 'state'), after = 'did')
+setcolorder(municipals, c('ars', 'ags', 'geo_name', 'did', 'district_name', 'state'))
 
 ## Shapes ---------------------------------------------------------------------
 # The compact version comes redundancy-free i.e. the shapes are the lower admin
