@@ -7,8 +7,8 @@ count_missing <- function(df) {
     {\(x) data.frame(var = names(x), count = unname(unlist(x)))}()
 }
 
-rents_homes = fread("data/homes-rents_2016-2021.csv")
-rents_aparts = fread("data/apartments-rents_2016-2021.csv")
+rents_homes = fread(sprintf("data/homes-rents_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
+rents_aparts = fread(sprintf("data/apartments-rents_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
 
 # rm duplicates
 nrh = nrow(rents_homes)
@@ -37,6 +37,7 @@ rents_aparts[, (not4Aparts) := special_code]
 rents = rbindlist(list(rents_homes, rents_aparts), use.names=TRUE)
 
 rents = rbindlist(list(rents_homes, rents_aparts), use.names = TRUE, fill = TRUE)
+# rename the grid variable to grid_id
 if (!("grid_id" %in% names(rents))) {
   if ("ergg_1km" %in% names(rents)) {
     setnames(rents, "ergg_1km", "grid_id")
@@ -54,8 +55,8 @@ order_of_vars = c(
 )
 
 setcolorder(rents, order_of_vars)
-setnames(rents, "kid2019", "did")
-setnames(rents, "rent_cold", "rent")
+setnames(rents, "kid2019", "did") # rename to district ID (did)
+setnames(rents, "rent_cold", "rent") # rename rent_cold to rent
 
 
 
@@ -68,6 +69,7 @@ rents = rents[grid_id > 0 & rent > 0 & floor_space > 0 & num_rooms > 0 & utiliti
 message(sprintf("%.2f%% observations dropped", 100-100*nrow(rents)/n))
 
 ### house type ----
+# the combination of categories follows FDZ recommendations
 rents[, `:=`(house_type = fcase(
   house_type == -7 | house_type == -9, 0L,
   house_type == 1 | house_type == 2, 1L,
@@ -119,18 +121,14 @@ rents[condition < 0, condition := 0L]
 rents[, condition := factor(
   condition,
   0L:10L,
-  c(
-    "na", "First occupancy", "First occupancy after reconstruction", "Like new",
-    "Reconstructed", "Modernised", "Completely renovated", "Well kempt",
-    "Needs renovation", "By arrangement", "Dilapidated"
-  )
+  c("na", get_value_labels('objektzustand', include_missing=FALSE)$label)
 )]
-
 
 ### number of bedrooms ----
 rents[, num_bedrooms := fcase(
   num_bedrooms <= 0, 0L,
   num_bedrooms >= 7, 7L,
+  # basically ifelse(TRUE):
   rep_len(TRUE, length(num_bedrooms)), num_bedrooms
 )]
 rents[, num_bedrooms := factor(
@@ -144,6 +142,7 @@ rents[, num_bedrooms := factor(
 rents[, num_bathrooms := fcase(
   num_bathrooms <= 0, 0L,
   num_bathrooms >= 4, 4L,
+  # basically ifelse(TRUE):
   rep_len(TRUE, length(num_bathrooms)), num_bathrooms
 )]
 rents[, num_bathrooms := factor(
@@ -157,6 +156,7 @@ rents[, num_bathrooms := factor(
 rents[, num_floors := fcase(
   between(num_floors, -11, 0), 0L,
   between(num_floors, 4, max(num_floors)), 4L,
+  # basically ifelse(TRUE):
   rep_len(TRUE, length(num_floors)), num_floors
 )]
 rents[, num_floors := factor(num_floors, 0:4, c("na", 1:3, "4+"))]
@@ -166,7 +166,7 @@ rents[between(equipment, -11, 0), equipment := 0]
 rents[, equipment := factor(
   equipment,
   0:4,
-  c("na", "Simple", "Normal", "Sophisticated", "Deluxe")
+  c("na", get_value_labels("ausstattung", include_missing=FALSE)$label)
 )]
 
 
@@ -203,12 +203,7 @@ rents[heating_type < 0, heating_type := 0]
 rents[, heating_type := factor(
   heating_type,
   0L:13L,
-  c(
-    "na", "Cogeneration/combined heat and power plant", "Electric heating",
-    "Self-contained central heating", "District heating", "Floor heating",
-    "Gas heating", "Wood pellet heating", "Night storage heaters", "Heating by stove",
-    "Oil heating", "Solar heating", "Thermal heat pump", "Central heating"
-  )
+  c("na", get_value_labels("heizungsart", include_missing=FALSE)$label)
 )]
 
 
@@ -223,15 +218,9 @@ binary_vars = c(
 
 binary_vars = binary_vars[binary_vars %in% names(rents)]
 
-# check if absence of the info in a binary variable is denoted by 0
-check_for_0 = logical(length(binary_vars))
 for (i in seq_along(binary_vars)) {
-  check_for_0[[i]] =
-    all(0 %in% unique(rents[[binary_vars[[i]]]]))
-}
-
-for (i in seq_along(binary_vars)) {
-  if (check_for_0[[i]]) {
+  # check if absence of the info in a binary variable is denoted by 0
+  if (0 %in% unique(rents[[binary_vars[[i]]]])) {
     rents[, (binary_vars[[i]]) := lapply(.SD, function(v) {
       fcase(
         v == -9 | v == -7, 0L,
@@ -249,18 +238,20 @@ for (i in seq_along(binary_vars)) {
     ))
   }
 }
+# create factors for the new binary variables
 rents[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 
 # house keeping
-rm(binary_vars, i, check_for_0)
+rm(binary_vars, i)
 
 
 # drop districts that do not exist under the BKG (2019.12.31) definition, if any
-districts = fread("extra/admin-areas/admin-areas/districts_bkg.csv", select = "did")
+districts = fread("extra/admin-areas/districts_bkg.csv", select = "did")
 rents = merge(rents, districts, 'did')
 rm(districts)
 
 # compute distance to the CBD -----
+# NOTE: you need to run extra/create_admin-areas.R in order to produce de-grid.gpkg
 de_grid = st_read('extra/admin-areas/germany-grid/de-grid.gpkg')
 lmrs = fread(
   "extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.csv",
@@ -290,7 +281,7 @@ rents = merge(rents, dist2cbd, c('grid_id', 'did'))
 
 ## import consumer price index (CPI) for inflation adjustment ----
 # source: https://www-genesis.destatis.de/genesis/online?sequenz=statistikTabellen&selectionname=61121&language=en#abreadcrumb
-cpi = fread("data/cpi_61121-0002.csv", skip = 6, header = FALSE, select = 1:3, na.strings = "...", col.names = c('year', 'mon', 'cpi'))
+cpi = fread("extra/cpi_61121-0002.csv", skip = 6, header = FALSE, select = 1:3, na.strings = "...", col.names = c('year', 'mon', 'cpi'))
 cpi[, year := as.integer(year)][, mon := match(mon, month.name)]
 # fwrite(cpi, 'data/consumer-price-index_monthly_base-year-2015.csv')
 
@@ -332,6 +323,7 @@ rents = rents[constr_year >= 1900 | is.na(constr_year), ]
 rents[is.na(constr_year) & !is.na(renov_year), constr_year := renov_year]
 rents[is.na(renov_year) & !is.na(constr_year), renov_year := constr_year]
 
+# imput construction year by the median value based on house_type
 rents[, `:=`(
   constr_year = fifelse(
     is.na(constr_year),
@@ -340,8 +332,8 @@ rents[, `:=`(
   )
 ), house_type]
 
-# impute renovation year by the median value,
-# if not, replace it with construction year
+# impute renovation year by the median value based on house_type,
+# if not, replace it with construction year (which we already imputed above)
 rents[, `:=`(
   renov_year = fifelse(
     is.na(renov_year),
@@ -381,5 +373,7 @@ nrow(rents)/n
 # write to disk ----
 if (file.exists("data/processed/rents_homes-apartments_ready.csv")) {
   warning("File has been overwritten!", call. = FALSE)
+} else if (!dir.exists("data/processed")) {
+  dir.create("data/processed")
 }
 fwrite(rents, "data/processed/rents_homes-apartments_ready.csv")
