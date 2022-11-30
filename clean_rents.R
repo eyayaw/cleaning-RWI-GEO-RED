@@ -36,7 +36,9 @@ rents_homes[, (not4Homes) := special_code]
 rents_aparts[, (not4Aparts) := special_code]
 rents = rbindlist(list(rents_homes, rents_aparts), use.names=TRUE)
 
-rents = rbindlist(list(rents_homes, rents_aparts), use.names = TRUE, fill = TRUE)
+# housekeeping
+rm(rents_homes, rents_aparts)
+
 # rename the grid variable to grid_id
 if (!("grid_id" %in% names(rents))) {
   if ("ergg_1km" %in% names(rents)) {

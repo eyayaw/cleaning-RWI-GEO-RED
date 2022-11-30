@@ -38,6 +38,9 @@ sales_homes[, (not4Homes) := special_code]
 sales_aparts[, (not4Aparts) := special_code]
 sales = rbindlist(list(sales_homes, sales_aparts), use.names=TRUE)
 
+# housekeeping
+rm(sales_homes, sales_aparts)
+
 if (!("grid_id" %in% names(sales))) {
   if ("ergg_1km" %in% names(sales)) {
     setnames(sales, "ergg_1km", "grid_id")
