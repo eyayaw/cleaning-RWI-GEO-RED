@@ -13,7 +13,6 @@ tidy_fixeff <- function(fe_obj) {
 }
 
 homes_sales = fread("data/processed/homes_ready.csv", keepLeadingZeros = TRUE)
-homes_sales = homes_sales[!(zipcode %like% "^-(000)?"), ] # missing values?
 setnames(homes_sales, "ad_end_mon", "mon")
 
 # required variables

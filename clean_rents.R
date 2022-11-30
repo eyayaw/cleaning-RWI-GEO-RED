@@ -294,6 +294,7 @@ rents[, utilities := utilities / (cpi/100)]
 rents[, cpi := NULL]
 
 # zipcodes -----
+rents = rents[zipcode > 0, ] # there are some -9 zipcodes
 rents[, `:=`(zipcode = sprintf("%05i", zipcode))] # make 5 digit
 
 # Define new vars ----

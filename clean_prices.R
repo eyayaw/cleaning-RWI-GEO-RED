@@ -302,8 +302,8 @@ sales = merge(sales, cpi[year >= min(sales$year), ],
 sales[, price := price / (cpi/100)]  # divide by the deflator
 sales[, cpi := NULL] # remove cpi column
 
-
 # zipcodes ----
+sales = sales[zipcode > 0, ] # there are some -9 zipcodes
 sales[, `:=`(zipcode = sprintf('%05i', zipcode))] # make 5 digit
 
 # Define new vars ----

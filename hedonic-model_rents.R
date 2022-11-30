@@ -13,7 +13,6 @@ tidy_fixeff <- function(fe_obj) {
 }
 
 rents = fread("data/processed/rents_homes-apartments_ready.csv")
-rents = rents[!(zipcode %like% "^-(000)?"), ] # rm missing zip codes, if any
 rents[, lndist2cbd := log(1 + dist2cbd)] # adding 1 avoids log(dist->0) becoming -Inf
 setnames(rents, 'ad_end_mon', 'mon')
 
