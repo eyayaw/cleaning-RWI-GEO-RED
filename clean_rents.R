@@ -69,7 +69,7 @@ rents = rents[grid_id > 0 & rent > 0 & floor_space > 0 & num_rooms > 0 & utiliti
 message(sprintf("%.2f%% observations dropped", 100-100*nrow(rents)/n))
 
 ### house type ----
-# the combination of categories follows FDZ recommendations
+# the combination of categories follows 'Klick & Schaffner' (2019)
 rents[, `:=`(house_type = fcase(
   house_type == -7 | house_type == -9, 0L,
   house_type == 1 | house_type == 2, 1L,
@@ -83,14 +83,14 @@ rents[, `:=`(house_type = fcase(
 rents[, house_type := factor(
   house_type, c(0L:6L, special_code),
   c(
-    "na", # -9 (Sonstiges Missing) + -7 (Keine Angabe)
+    "na",            # -9 (Sonstiges Missing) + -7 (Keine Angabe)
     "single-family", #  1 Single-family house (detached) + 2 Single-family house
-    "two-family", # 11 two-family houses + 12 block of flats
+    "two-family",    # 11 two-family houses + 12 block of flats
     "semi-detached", # itself, 3 semi-detached
-    "terraced", # 4 terraced + 5 terraced (middle unit) + 6 terraced (end unit)
-    "other", # 13 other property for living + 15 other
-    "special", # 7 Bungalow + 8 Farmhouse + 9 Castle + 10 Mansion + 14 Special property
-    "apartments" # 0-6 are for homes, `special_code` is for flats (WM_SUF)--a special type by construction
+    "terraced",      # 4 terraced + 5 terraced (middle unit) + 6 terraced (end unit)
+    "other",         # 13 other property for living + 15 other
+    "special",       # 7 Bungalow + 8 Farmhouse + 9 Castle + 10 Mansion + 14 Special property
+    "apartments"     # 0-6 are for homes, `special_code` is for flats (WM_SUF)--a special type by construction
   )
 )]
 
@@ -100,18 +100,18 @@ rents[flat_type == 11 | flat_type == -7 | flat_type == -9, flat_type := 0L]
 rents[, flat_type := factor(
   flat_type, c(0L:10L, special_code),
   c(
-    "na", # -9 (Sonstiges Missing) + -7 (Keine Angabe)
-    "attic", #  1 Attic flat
-    "ground-floor", #  2 Ground floor flat
-    "flat", #  3 Flat
+    "na",                  # -9 (Sonstiges Missing) + -7 (Keine Angabe)
+    "attic",               #  1 Attic flat
+    "ground-floor",        #  2 Ground floor flat
+    "flat",                #  3 Flat
     "raised-ground-floor", #  4 Raised ground floor flat
-    "loft", #  5 Loft
-    "Maisonette", #  6 Maisonette
-    "penthouse", #  7 Penthouse
-    "souterrain", #  8 Souterrain
-    "flat-with-terrace", #  9 Flat with terrace
-    "others", # 10
-    "houses" # 0-10 are for flats, `special_code` is for houses (HM_SUF)--a special type by construction
+    "loft",                #  5 Loft
+    "Maisonette",          #  6 Maisonette
+    "penthouse",           #  7 Penthouse
+    "souterrain",          #  8 Souterrain
+    "flat-with-terrace",   #  9 Flat with terrace
+    "others",              # 10
+    "houses"               # 0-10 are for flats, `special_code` is for houses (HK_SUF)--a special type by construction
   )
 )]
 
@@ -128,7 +128,7 @@ rents[, condition := factor(
 rents[, num_bedrooms := fcase(
   num_bedrooms <= 0, 0L,
   num_bedrooms >= 7, 7L,
-  # basically ifelse(TRUE):
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_bedrooms)), num_bedrooms
 )]
 rents[, num_bedrooms := factor(
@@ -142,7 +142,7 @@ rents[, num_bedrooms := factor(
 rents[, num_bathrooms := fcase(
   num_bathrooms <= 0, 0L,
   num_bathrooms >= 4, 4L,
-  # basically ifelse(TRUE):
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_bathrooms)), num_bathrooms
 )]
 rents[, num_bathrooms := factor(
@@ -156,7 +156,7 @@ rents[, num_bathrooms := factor(
 rents[, num_floors := fcase(
   between(num_floors, -11, 0), 0L,
   between(num_floors, 4, max(num_floors)), 4L,
-  # basically ifelse(TRUE):
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_floors)), num_floors
 )]
 rents[, num_floors := factor(num_floors, 0:4, c("na", 1:3, "4+"))]
