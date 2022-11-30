@@ -4,7 +4,7 @@ source("helpers/base-helpers.R")
 source("helpers/helpers.R")
 
 # params
-since_when = 2016 # keep observations since
+since_when = Sys.getenv("YEAR_START") # keep observations since
 extract_raw_files = FALSE # if not extracted, extract files
 
 
@@ -21,11 +21,11 @@ extract_raw_files = FALSE # if not extracted, extract files
 ## caution: utils::unzip may truncate extraction if the size is > 4GB so don't rely on it
 ## better to do it with the command line or manually with 7zip etc
 zipfile = "../RED_v6.1.zip"
-extractdir = paste0("../.", file.stem(zipfile)) # create a hidden folder
+extractdir = Sys.getenv("RED_FOLDER") 
 
 if (extract_raw_files) {
   # o for overwrite d for directory
-  system(sprintf("unzip -o -d %s %s", extractdir, zipfile)) # extract to the hidden folder
+  system(sprintf("unzip -o -d %s %s", extractdir, zipfile)) # extract to the RED folder
   }
 
 
@@ -48,6 +48,10 @@ for (zfile in homes_zipfile) {
     }
   }
 }
+
+# the data will be saved in a "data" directory
+# check if it exists, otherwise create it
+if(!dir.exists("data")) dir.create("data")
 
 # iterate over homes/apartments for sale (HK_SUF,WK_SUF) and -----
 # homes/apartments for rent (HM_SUF,WM_SUF)
@@ -87,12 +91,12 @@ for (h in seq_along(dlist)) {
     unlist() |>
     grep('^[e]?jahr$', x = _, value = TRUE)
   yearvar = if ("jahr" %in% yearvar) {
-  "jahr"
-} else if ("ejahr" %in% yearvar) {
-  "ejahr"
-} else {
-  stop("No `year` variable in the data set.", call. = FALSE)
-}
+    "jahr"
+  } else if ("ejahr" %in% yearvar) {
+    "ejahr"
+  } else {
+    stop("No `year` variable in the data set.", call. = FALSE)
+  }
   years_in_dataset = lapply(file_list, \(f) unique(read_dta(f, col_select = (yearvar)))) |>
     rbindlist(idcol = "file")
 

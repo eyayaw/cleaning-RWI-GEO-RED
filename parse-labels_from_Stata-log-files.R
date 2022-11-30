@@ -76,7 +76,7 @@ get_labels <- function(path) {
 }
 
 # write to disk ----
-labels = get_labels('.RED_v6.0/Dokumentation/Labels/Labels_Immoscout_HK_en.txt')
+labels = get_labels(paste0(Sys.getenv('RED_FOLDER'), '/Dokumentation/Labels/Labels_Immoscout_HK_en.txt'))
 
 dict = with(labels$variable,
             data.frame(var_de = name, label, var_en = make_names(label)))
