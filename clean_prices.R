@@ -1,15 +1,16 @@
 library(data.table)
 library(sf)
 
-source("script/helpers/helpers.R")
+source("helpers/helpers.R")
 # count missing values, which are flagged by any negative number
 count_missing <- function(df) {
   lapply(df, \(x) sum(x < 0)) |>
     {\(x) data.frame(var = names(x), count = unname(unlist(x)))}()
 }
 
-sales_homes = fread("data/homes-sales_2016-2021.csv")
-sales_aparts = fread("data/apartments-sales_2016-2021.csv")
+sales_homes = fread(sprintf("data/homes-sales_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
+sales_aparts = fread(sprintf("data/apartments-sales_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
+
 
 # rm duplicates
 nrh = nrow(sales_homes)
@@ -68,6 +69,7 @@ sales = sales[grid_id > 0 & price > 0 & floor_space > 0 & num_rooms > 0, ]
 message(sprintf("%.2f%% observations dropped", 100-100*nrow(sales)/n))
 
 ### house type ----
+# the combination of categories follows 'Klick & Schaffner' (2019)
 sales[, house_type := fcase(
   house_type == -7 | house_type == -9, 0L,
   house_type == 1 | house_type == 2, 1L,
@@ -98,18 +100,18 @@ sales[flat_type == 11 | flat_type == -7 | flat_type == -9, flat_type := 0L]
 sales[, flat_type := factor(
   flat_type, c(0L:10L, special_code),
   c(
-    "na", # -9 (Sonstiges Missing) + -7 (Keine Angabe)
-    "attic", #  1 Attic flat
-    "ground-floor", #  2 Ground floor flat
-    "flat", #  3 Flat
+    "na",                  # -9 (Sonstiges Missing) + -7 (Keine Angabe)
+    "attic",               #  1 Attic flat
+    "ground-floor",        #  2 Ground floor flat
+    "flat",                #  3 Flat
     "raised-ground-floor", #  4 Raised ground floor flat
-    "loft", #  5 Loft
-    "Maisonette", #  6 Maisonette
-    "penthouse", #  7 Penthouse
-    "souterrain", #  8 Souterrain
-    "flat-with-terrace", #  9 Flat with terrace
-    "others", # 10
-    "houses" # 0-10 are for flats, `special_code` is for houses (HK_SUF)--a special type by construction
+    "loft",                #  5 Loft
+    "Maisonette",          #  6 Maisonette
+    "penthouse",           #  7 Penthouse
+    "souterrain",          #  8 Souterrain
+    "flat-with-terrace",   #  9 Flat with terrace
+    "others",              # 10
+    "houses"               # 0-10 are for flats, `special_code` is for houses (HK_SUF)--a special type by construction
   )
 )]
 
@@ -119,11 +121,7 @@ sales[condition < 0, condition := 0L]
 sales[, condition := factor(
   condition,
   0L:10L,
-  c(
-    "na", "First occupancy", "First occupancy after reconstruction", "Like new",
-    "Reconstructed", "Modernised", "Completely renovated", "Well kempt",
-    "Needs renovation", "By arrangement", "Dilapidated"
-  )
+  c("na", get_value_labels('objektzustand', include_missing=FALSE)$label)
 )]
 
 
@@ -131,6 +129,7 @@ sales[, condition := factor(
 sales[, num_bedrooms := fcase(
   num_bedrooms <= 0, 0L,
   num_bedrooms >= 7, 7L,
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_bedrooms)), num_bedrooms
 )]
 
@@ -145,6 +144,7 @@ sales[, num_bedrooms := factor(
 sales[, num_bathrooms := fcase(
   num_bathrooms <= 0, 0L,
   num_bathrooms >= 4, 4L,
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_bathrooms)), num_bathrooms
 )]
 
@@ -159,6 +159,7 @@ sales[, num_bathrooms := factor(
 sales[, num_floors := fcase(
   between(num_floors, -11, 0), 0L,
   between(num_floors, 4, max(num_floors)), 4L,
+  # basically else [ifelse(TRUE)]:
   rep_len(TRUE, length(num_floors)), num_floors
 )]
 
@@ -169,7 +170,7 @@ sales[between(equipment, -11, 0), equipment := 0]
 sales[, equipment := factor(
   equipment,
   0:4,
-  c("na", "Simple", "Normal", "Sophisticated", "Deluxe")
+  c("na", get_value_labels("ausstattung", include_missing=FALSE)$label)
 )]
 
 ### year of construction, year of renovation ----
@@ -205,10 +206,7 @@ sales[heating_type < 0, heating_type := 0]
 sales[, heating_type := factor(
   heating_type,
   0L:13L,
-  c("na", "Cogeneration/combined heat and power plant", "Electric heating",
-    "Self-contained central heating", "District heating", "Floor heating",
-    "Gas heating", "Wood pellet heating", "Night storage heaters", "Heating by stove",
-    "Oil heating", "Solar heating", "Thermal heat pump", "Central heating")
+  c("na", get_value_labels("heizungsart", include_missing=FALSE)$label)
 )]
 
 
@@ -217,7 +215,7 @@ sales[, heating_type := factor(
 sales[constr_phase <= 0, constr_phase := 0L]
 sales[, constr_phase := factor(
   constr_phase, c(0L:3L,special_code),
-  c("na", "House in process of planning", "House in process of building", "House built", "D.N.A.")
+  c("na", get_value_labels("bauphase", include_missing=FALSE)$label, "D.N.A.")
 )]
 
 ### binary variables -----
@@ -229,15 +227,9 @@ binary_vars = c(
   "elevator", "balcony", "kitchen", "public_housing_cert", "betreut", "garden"
 )
 
-# check if absence of the info in a binary variable is denoted by 0
-check_for_0 = logical(length(binary_vars))
 for (i in seq_along(binary_vars)) {
-  check_for_0[[i]] =
-    all(0 %in% unique(sales[[binary_vars[[i]]]]))
-}
-
-for (i in seq_along(binary_vars)) {
-  if (check_for_0[[i]]) {
+  # check if absence of the info in a binary variable is denoted by 0
+  if (0 %in% unique(sales[[binary_vars[[i]]]])) {
     sales[, (binary_vars[[i]]) := lapply(.SD, function(v) {
       fcase(v == -9 | v == -7, 0L,
             between(v, -11, -1), NA_integer_,
@@ -256,7 +248,7 @@ for (i in seq_along(binary_vars)) {
 sales[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 
 # house keeping
-rm(order_of_vars, binary_vars, i, check_for_0)
+rm(order_of_vars, binary_vars, i)
 
 # remove protected buildings
 # sales = sales[protected_building == 0, ]
@@ -299,7 +291,7 @@ sales = merge(sales, dist2cbd, c('grid_id', 'did'))
 
 ## import consumer price index (CPI) for inflation adjustment ----
 # source: https://www-genesis.destatis.de/genesis/online?sequenz=statistikTabellen&selectionname=61121&language=en#abreadcrumb
-cpi = fread("data/cpi_61121-0002.csv", skip = 6, header = FALSE, select = 1:3, na.strings = "...", col.names = c('year', 'mon', 'cpi'))
+cpi = fread("extra/cpi_61121-0002.csv", skip = 6, header = FALSE, select = 1:3, na.strings = "...", col.names = c('year', 'mon', 'cpi'))
 cpi[, year := as.integer(year)][, mon := match(mon, month.name)]
 # fwrite(cpi, 'data/consumer-price-index_monthly_base-year-2015.csv')
 
@@ -308,7 +300,7 @@ sales = merge(sales, cpi[year >= min(sales$year), ],
               by.x = c("year", "ad_end_mon"), by.y = c("year", "mon")
               )
 sales[, price := price / (cpi/100)]  # divide by the deflator
-sales[, cpi := NULL]
+sales[, cpi := NULL] # remove cpi column
 
 
 # zipcodes ----
@@ -381,7 +373,7 @@ sales[, age1 := renov_year - constr_year]
 
 # handle outliers
 # discard properties with
-# (i) a monthly rental price below 250e/m2 or above 25000e/m2
+# (i) a sales price below 250e/m2 or above 25000e/m2
 # (ii) floor space below 30m2 or above 500m2
 n = nrow(sales)
 sales = sales[exp(lnprice_sqm) >= 250 & exp(lnprice_sqm) <= 25000 & floor_space >= 30 & floor_space <= 500, ]

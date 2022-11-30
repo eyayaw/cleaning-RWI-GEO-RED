@@ -11,7 +11,57 @@ Somes of the steps in the scripts might not be relevant for your particular use 
 5. [hedonic-model_prices.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_prices.R)
 6. [hedonic-model_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_rents.R)
 
-### A note on hedonic index
+## Usage
+
+Besides installing packages, you need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
+
+```
+RED_FOLDER=C:/Users/x/RWI-GEO-RED_v6
+YEAR_START=2007
+YEAR_END=2021
+```
+
+Furthermore, you need to download additional data:
+
+- For the CPI to work, [download the monthly CPI from Destatis](https://www-genesis.destatis.de/genesis/online?sequenz=statistikTabellen&selectionname=61121&language=en#abreadcrumb) (make sure to select the years you need) and save it as `extra/cpi_61121-0002.csv`
+
+## Features
+
+[clean_prices.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_prices.R) and [clean_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R) filter and clean the data for house/apartment prices and rents respectively. Furthermore, datasets for houses and apartments are combined, 
+
+- Filtering:
+  - [only keep the maximum spell for each obid-year combination](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R#L15)
+  - rents: only keep observations with `grid_id > 0 & rent > 0 & floor_space > 0 & num_rooms > 0 & utilities > 0`
+  - prices: only keep observations with `grid_id > 0 & price > 0 & floor_space > 0 & num_rooms > 0` 
+
+- Combining rents for apartments and houses:
+  - assign code `999L` to object properties that only apply to the other category (apartments/houses)
+
+- Cleaning:
+  - missing values (with FDZ codes < 0) are recoded to "na"
+  - `num_bedrooms`: limited between 1 and 7 bedrooms (`>=7` recoded to `7+`), missing recoded to "na or 0"
+  - `num_bathrooms`, `num_floors`: limited between 1 and 4 (rest see `num_bedrooms`)
+
+Additional processing at the end of `clean_rents.R`:
+
+- construction/renovation year
+  - construction year <-> renovation year in case the other one is NA
+  - drop construction years below 1900
+    - if NA, impute construction year and drop imputations < 1900
+- discard properties with
+  - (i) a monthly rental price below 1e/m2 or above 50e/m2
+  - (ii) floor space below 30m2 or above 500m2
+  
+And finally:
+
+- the distance to the central business district (CBD) is computed and
+- the consumer price index (CPI) is used to adjust rents/prices for inflation
+
+### Open issues
+
+- kategorie_Wohnung has label value "11" that has no label (neither Stata nor csv, in the csv the label is "11")
+
+## A note on constructing a hedonic index
 
 The data come with a rich set of property characteristics which enable us to compute a hedonic (price) index to quality-adjust house prices. I construct a mix-adjusted house price index from the following panel hedonic regression
 
