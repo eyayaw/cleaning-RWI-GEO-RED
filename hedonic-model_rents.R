@@ -47,8 +47,11 @@ rents_home[, (cats_rents_home) := lapply(.SD, as.factor), .SDcols=cats_rents_hom
 rents = list(flats=rents_flat, homes=rents_home)
 
 # Estimate the fixed effects model with dummy variable estimator
-parts = lapply(list(var_list_rents_flat, var_list_rents_home), \(vlist)
-paste0("lnrent_sqm ~ 0 + ", paste(setdiff(vlist, c(dep_var, fixeffs)), collapse = " + ")
+# for this we now create our estimation equation both for flats and homes
+parts = lapply(list(var_list_rents_flat, var_list_rents_home), 
+  # setdiff() helps us to exclude some variables (dep_var and fixeffs)
+  # that we already put into our model in other places
+  \(vlist) paste0("lnrent_sqm ~ 0 + ", paste(setdiff(vlist, c(dep_var, fixeffs)), collapse = " + ")
 ))
 ## all homes ----
 ### using `fixest` package ---------------------------------------------------------
