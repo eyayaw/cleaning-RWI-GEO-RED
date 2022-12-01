@@ -43,7 +43,7 @@ hpi = cbind(
 
 # write to disk
 fwrite(hpi, 'data/processed/HPI_exact-geoloc_all-homes.csv')
-fwrite(fe_tidy,'data/processed/HPI_all-homes.csv')
+fwrite(fe,'data/processed/HPI_all-homes.csv')
 
 
 # export regression output
