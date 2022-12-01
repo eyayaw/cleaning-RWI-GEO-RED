@@ -16,14 +16,6 @@ rents = fread("data/processed/rents_homes-apartments_ready.csv")
 rents[, lndist2cbd := log(1 + dist2cbd)] # adding 1 avoids log(dist->0) becoming -Inf
 setnames(rents, 'ad_end_mon', 'mon')
 
-# handle outliers
-# discard properties with
-# (i) a monthly rental price below 1e/m2 or above 50e/m2
-# (ii) floor space below 30m2 or above 500m2
-n = nrow(rents)
-rents = rents[exp(lnrent_sqm) >= 1 & exp(lnrent_sqm) <= 50 & floor_space >= 30 & floor_space <= 500, ]
-nrow(rents)/n
-
 ## required variables
 dep_var = 'lnrent_sqm'
 fixeffs = c('zipcode', 'did', 'mon','year')
