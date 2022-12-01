@@ -380,3 +380,6 @@ if (file.exists("data/processed/rents_homes-apartments_ready.csv")) {
   dir.create("data/processed")
 }
 fwrite(rents, "data/processed/rents_homes-apartments_ready.csv")
+
+rm(list = setdiff(ls(), lsf.str())) # remove all objects except for functions
+gc() # initiate the garbage collector

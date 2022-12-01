@@ -392,4 +392,6 @@ if (file.exists('data/processed/homes_ready.csv')) {
 }
 fwrite(sales, 'data/processed/homes_ready.csv')
 
+rm(list = setdiff(ls(), lsf.str())) # remove all objects except for functions
+gc() # initiate the garbage collector
 
