@@ -52,7 +52,6 @@ correction = tibble::tribble(
 
 )
 
-
 new = merge(lmrs, correction, by = c("district_id", "district_name"))
 new = new[, c("amr_id", "amr_name", "new_district_id", "new_district_name")] |>
   setNames(c("amr_id", "amr_name", "district_id", "district_name"))
@@ -64,22 +63,23 @@ stopifnot(
 )
 
 # labor market regions updated for the 2019 district border definitions
-write.csv(new_lmrs, "extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.csv",
+write.csv(
+  new_lmrs, "extra/Labor-Market-Regions_Kosfeld-Werner-2012_2019.csv",
   quote = FALSE, row.names = FALSE
 )
 
-## construct the shapes of the labor market regions
 
-lmrs_shape = districts |>
-  merge(new_lmrs, by.x = "did", by.y = "district_id") |>
+## construct the shapes of the labor market regions
+lmrs_shape = merge(districts, new_lmrs, by.x = "did", by.y = "district_id") |>
   {\(.x) aggregate(
     x = .x[, c("did", "name", "geometry")],
     by = list(amr_id = .x$amr_id, amr_name = .x$amr_name),
     FUN = \(x) paste0(x, collapse = "|")
     )
   }()
-
+lmrs_shape = lmrs_shape[order(lmrs_shape$amr_id), ]
 names(lmrs_shape)[match(c("did", "name"), names(lmrs_shape))] = c("district_id", "district_name")
+
 
 # write the shapes
 st_write(lmrs_shape,

@@ -1,35 +1,44 @@
-
-source("helpers/base-helpers.R")
-source("helpers/strings.R")
+source("script/helpers/base-helpers.R")
+makeNames <- function(x, sep = "_") {
+    nms = make.names(tolower(x), allow_ = FALSE)
+    nms = gsub("\\.+", sep, nms)
+    nms = sub("^X", "", nms)
+    nms = gsub(sprintf("(^%s+)|(%s+$)", sep, sep), "", nms)
+    nms
+}
 
 # this script parses variable and value labels from the Stata labels log file
 # input: path to the (Stata) log file that contains variable/value labels
 # for example, the log file for homes for sale (HK) is `./Dokumentation/Labels/Labels_Immoscout_HK_en.txt`
 
 get_labels <- function(path) {
-  if (!grepl("Labels_Immoscout_(W|H)(K|M)_en[.]txt$", path))
+  if (!grepl("Labels_Immoscout_(W|H)(K|M)_en[.]txt$", path)) {
     stop('Expecting a Stata log file with `_en.txt` ending', call. = FALSE)
+    }
   labels = readLines(path)
   header_end = grep("opened on:", labels)
   footer_start = max(grep("name:", labels))
-  labels = labels[-(1:header_end)] # rm header
+  if (is.null(header_end) || is.null(footer_start)){
+    stop("Could not parse the location of the header and footer!", call. = FALSE)
+  }
+  labels = labels[-(1:header_end)]       # rm header
   labels = labels[1:(footer_start - 1L)] # rm footer
 
-  # each variable's info is separated by 'empty line' in the file
+  # variables' info is separated by 'empty line' in the file
   index = which(labels == "")
   ne = length(index)
   out = vector("list", ne)
   s = 1
-  for (i in seq_len(ne)) {
+  for (i in 1:ne) {
     out[[i]] = c(s, index[[i]] - 1)
     s = index[[i]] + 1
   }
 
   lbls = lapply(out, function(x) labels[x[[1]]:x[[2]]])
   var_names = vapply(lbls, `[[`, "", 1L) |>
-    str_extract("\\(\\w+?\\)$") |> # (not greedy is important e.g. look at Unique_ID)
+    {\(x) regmatches(x, regexpr("\\(\\w+?\\)$", x))}() |> # (not greedy is important e.g. look at Unique_ID)
     unname() |>
-    str_remove_all("[()]")
+    gsub(pattern="[()]",replacement="", x=_)
   names(lbls) = var_names
 
   # some vars do not have value labels
@@ -44,9 +53,9 @@ get_labels <- function(path) {
     attribute = x[c(1, 2)]
     x = trimws(x[-c(1, 2)])
     n = length(x)
-    x = strcapture("(^-?\\d{1,}) (.+)", x,
-                  data.frame(value = integer(n), label = character(n))
-                  )
+    x = strcapture(
+      "(^-?\\d{1,}) (.+)", x,data.frame(value = integer(n), label = character(n))
+      )
     attr(x, "info") <- attribute
     x
   })
@@ -76,11 +85,10 @@ get_labels <- function(path) {
 }
 
 # write to disk ----
-labels = get_labels(paste0(Sys.getenv('RED_FOLDER'), '/Dokumentation/Labels/Labels_Immoscout_HK_en.txt'))
+labels = get_labels('../Common-Data/.RED_v6.0/Dokumentation/Labels/Labels_Immoscout_HK_en.txt')
 
-dict = with(labels$variable,
-            data.frame(var_de = name, label, var_en = make_names(label)))
-write.csv(dict, 'variable-and-value_labels/variable-labels.csv', row.names = FALSE)
+dict = with(labels$variable, data.frame(var_de = name, label, var_en = makeNames(label)))
+write.csv(dict, 'data/variable-and-value_labels/variable-labels.csv', row.names = FALSE)
 
 # has labels other than labels for missing values
 has_real_labels = with(labels, sapply(value, \(x) !all(x[['value']] < 0)))
@@ -91,24 +99,28 @@ with(labels, lapply(
     x
   ))
 )) |> do.call(what = rbind) |>
-  write.table('variable-and-value_labels/value-labels.txt', quote = FALSE, row.names = FALSE)
+  write.table('data/variable-and-value_labels/value-labels.txt', quote = FALSE, row.names = FALSE)
 
 # value labels for missing values
 special_value_labels = with(labels, value[!has_real_labels]) |>
   do.call(what = rbind) |>
   unique()
 rownames(special_value_labels) = NULL
-write.csv(special_value_labels,
-          'variable-and-value_labels/missing-value_labels.csv', quote = FALSE, row.names = FALSE
-          )
+write.csv(
+  special_value_labels,'data/variable-and-value_labels/missing-value_labels.csv',
+  quote = FALSE, row.names = FALSE
+  )
 
 # get value labels of a factor variable
 ## include_missing is to exclude -5 to -11 which are special missing values
 get_value_labels <- function(var_name, include_missing = TRUE) {
-  stopifnot(`Make sure the var_name is correct`=var_name %in% names(labels$value))
+  stopifnot(
+    `The \`var_name\` is not correct. Try passing the var_name in german?` = var_name %in% names(labels$value)
+  )
   x <- labels$value[[var_name]]
-  if (is.null(x))
-    warning('label for `', var_name,'` not found. Make sure that you pass the correct var name.', call. = FALSE)
+  if (is.null(x)) {
+    warning("label for `", var_name, "` not found. Make sure that you pass the correct var name.", call. = FALSE)
+  }
   if (include_missing) {
     x
   } else if (!include_missing) {

@@ -2,76 +2,133 @@
 
 gold = (1+5^0.5)/2 # the golden ratio
 
-is.outlier <- function(x, cutoff=4, ...) {
-  m = mean(x, ...)
-  s = sd(x, ...)
-  (x < m - cutoff * s) | (x > m + cutoff * s)
+is_outlier <- function(x, cutoff = 4, na.rm = TRUE, ...) {
+  m = mean(x, na.rm = na.rm, ...)
+  s = sd(x, na.rm = na.rm, ...)
+  (x <= m - cutoff * s) | (x >= m + cutoff * s)
 }
 
-# growth rate
-grate <- function(x, n=1) {
-  (x/data.table::shift(x, n=n)) - 1
+# a practical cut
+cut2 <- function(x, ..., include.lowest = TRUE, right = FALSE) {
+  cut(x, ..., include.lowest = include.lowest, right = right)
 }
 
-round1 <- function(x) {
-  round(x, digits = 1L)
-}
-round2 <- function(x) {
-  round(x, digits = 2L)
-}
-round3 <- function(x) {
-  round(x, digits = 3L)
+# append 01 to mon-year -> date
+mydate <- function(mon, year) {
+  as.Date(paste0("01-", paste0(mon, '-', year)), "%d-%m-%Y")
 }
 
-# round + format
-formatNum <- function(x, digits = 0L, nsmall = digits, ...) {
-  format(round(x, digits = digits), big.mark = ",", trim = TRUE, nsmall = nsmall, ...)
+mdate <- function(x) {
+  as.Date(paste0("01-", x), "%d-%m-%Y")
 }
 
-fread_utf8 <- function(...) data.table::fread(..., encoding = "UTF-8")
-fread_keepzeros <- function(file, ..., keepLeadingZeros=TRUE) {
-  data.table::fread(file, ..., keepLeadingZeros = keepLeadingZeros)
-}
-appendLeadingZeros <- function(x) {
-  ifelse(grepl('^[1-9][0-9]{3}$', x), paste0('0', x), x)
-}
+fmy = function(x, format = "%b-%y") format.Date(x, format = format)
 
+meter = function(x) units::set_units(x, "m")
 
-# dln(x) = lnx_1 - lnx_0 = ln(x_1/x_0)
-# g = x_1/x_0 - 1
-ldiff2grate <- function(x, percent=FALSE) {
-  grate = exp(x)-1
-  if (percent)
-    return(grate * 100)
-  grate
+km = function(x) units::set_units(x, "km")
+
+getLabel <- function(x, math = FALSE) {
+  switch(x,
+    lnp = if (math) expression(ln ~ P) else "ln P",
+    lnr = if (math) expression(ln ~ R) else "ln R",
+    lnhpi = if (math) expression(ln ~ P) else "ln P",
+    lnhri = if (math) expression(ln ~ R) else "ln R",
+    x
+  )
 }
 
 
-# edit equation
-edit_eq <- function(eq) {
-  eq = trimws(eq, "both")
-  eq = gsub("(?<==) ?[+]", " ", eq, perl = T)
-  eq = gsub("([+-])", " \\1 ", eq, perl = T)
-  eq = sub("^[+]", "", eq)
-  eq = gsub("-", " - ", eq)
-  eq = gsub(" {2,}", " ", eq)
-  trimws(eq, "both")
+# tidy fixed effects from fixest::fixef()
+tidy_fixeff <- function(fe_obj) {
+  stopifnot(inherits(fe_obj, "fixest.fixef") && names(fe_obj) != "")
+  fe = data.frame(id = names(fe_obj[[1]]), eff = fe_obj[[1]])
+  fixeffs = strsplit(names(fe_obj), "^", fixed = TRUE)[[1]]
+  fe[, fixeffs] = do.call("rbind", strsplit(fe$id, "_"))
+  fe = fe[, c(fixeffs, "eff")]
+  rownames(fe) = NULL
+  fe
+}
+
+
+# count missing values, which are flagged by any negative number
+count_missing <- function(df) {
+  lapply(df, \(x) sum(x < 0)) |>
+    {\(x) data.frame(var = names(x), count = unname(unlist(x)))}()
+}
+
+
+# STL decomposition
+decomp = function(x,
+  do = c("deseason", "detrend", "remainder", 'trend', 'seasonal'),
+  start, end, freq = 12) {
+    # start = c(2018L, 1L), end = c(2021L, 12L)
+  if (nrow(x) < 2L) {
+    message('Atleast 2 obs needed! No operation')
+    return(x)
+    }
+  stopifnot(all(c("year", "mon", "val") %in% names(x)))
+  if (!missing(start) || !missing(end))
+    stopifnot(length(start) == length(end) && length(start) == 2L)
+
+  if (missing(start) || missing(end)) {
+    start = c(min(x$year), min(x$mon))
+    end = c(max(x$year), max(x$mon))
+    message(sprintf('Auto generated start[y, m]: [%i, %i]', start[1], start[2]))
+    message(sprintf('Auto generated end[y, m]: [%i, %i]', end[1], end[2]))
+}
+  do = match.arg(do)
+  message('STL Decompostion: <', do, '-ing>')
+  # x = x[order(x$year, x$mon),] # tidyr::completes does ordering automatically
+  xc = tidyr::complete(x, tidyr::expand(x, year = (start[1]:end[1]), mon = (start[2]:end[2])))
+  # tidyr::complete may put some year-mons that are not specified at the end
+  xc = xc[order(xc$year, xc$mon), ]
+  xts = ts(xc$val, start = start, end = end, frequency = freq)
+  # deal with NA actual and NA introduced by tidy::complete
+  seen = -(setdiff(which(is.na(xc$val)), which(is.na(x$val))))
+  if (length(seen) == 0) {
+    seen = seq_len(nrow(xc))
+  }
+  na.act = function(x) {
+    zoo::na.approx(x, na.rm = FALSE, rule = 2)
+  }
+  tryCatch(
+    {
+      components = stl(xts, s.window = "per", na.action = na.act)$time.series
+      xts = rowSums(components) # NA imputed
+      my = format(zoo::as.yearmon(time(components)), "%m-%Y")
+      stlval = switch(do,
+        deseason = xts - components[, "seasonal"],
+        detrend = xts - components[, "trend"],
+        remainder = components[, "remainder"],
+        trend = components[, 'trend'],
+        seasonal = components[, "reasonal"],
+        stop("Did you pass the right val for `return`?", call. = FALSE)
+      )
+      data.frame(
+        year = as.numeric(substr(my, 4, 7)),
+        mon = as.integer(substr(my, 1, 2)),
+        stlval = as.vector(stlval)
+      )
+    },
+    error = function(e) {
+      withCallingHandlers({
+        warning(e)
+        xc$val[seen]
+      })
+    }
+  )
 }
 
 
 
-lm_labels <- function(dat, x, y, xlab = 'x', ylab = 'y') {
-  form = as.formula(paste(y, '~', x))
-  mod = lm(form, data = dat)
-  se = summary(mod)$coefficients[2, 2]
-  formula = sprintf(
-    "italic(widehat(%s)) == %.2f %+.2f(%.2f) * italic(%s)",
-    ylab, coef(mod)[1], coef(mod)[2], se, xlab)
-  formula = sub("(?<!== )([-+])", '~\\1~', formula, perl = T)
-  r2 = cor(dat[[x]], dat[[y]])**2
-  r2 = sprintf("italic(R^2) == %.2f", r2)
-  data.frame(formula = formula, r2 = r2)
+# round function factory, useless?
+rnd <- function(digits) {
+  force(digits)
+  function(x) round(x, digits=digits)
 }
+
+
 
 ## -----------------------------------------
 
@@ -90,77 +147,3 @@ replace_missing_label_by_value <- function(x) {
     rep_len(TRUE, length(x)), x
   )
 }
-
-
-
-#' translate German var names into English (predefined in `table`)
-translate_names <- function(var_de, table = NULL) {
-
-  if (is.data.frame(var_de))
-    stop('Expecting a character vector, not a data.frame!
-         Perhaps, you want to translate the names of `var_de`?', call. = FALSE)
-
-  if (is.null(table)) {
-    source('script/cleaning/lists-of-variables.R', local = TRUE)
-    table = selected_vars[,c('var_de', 'var_en')]
-  }
-  idx = match(var_de, table$var_de)
-  out = table$var_en[idx]
-  not_translated = which(is.na(out))
-  out[not_translated] = var_de[not_translated]
-  out
-}
-
-translate_mon <- function(monat) {
-  mons = c("Januar", "Februar", "März", "April", "Mai", "Juni",
-           "Juli", "August", "September", "Oktober", "November","Dezember")
-  abb = c("Jan", "Feb", "März", "Apr", "Mai", "Juni",
-          "Juli", "Aug", "Sept", "Okt", "Nov", "Dez")
-  if (all(nchar(setdiff(monat, 'Mai')) >= 4L) )
-    out = month.name[match(tolower(monat), tolower(mons))]
-  else
-    out = month.name[match(tolower(monat), tolower(abb))]
-  out[which(is.na(out))] = monat[which(is.na(out))]
-  out
-}
-
-
-#' count cases per categories of cols
-freq <- function(df, cols) {
-  stopifnot('`df` needs to be a `data.table`.' = is.data.table(df))
-  types = vapply(df[, ..cols], class, character(1L))
-  facs = cols[types %in% c('factor', 'integer')]
-  chars = cols[types %in% 'character']
-  ignored = setdiff(cols, union(facs, chars))
-  if (length(ignored) != 0)
-    warning('Ignoring non factor and/or character vars: ',
-            paste0('`', ignored, '`', collapse = ", "), call. = FALSE)
-  cols = union(facs, chars)
-  lapply(cols, function(x) df[, .N, by = x])
-}
-
-
-## -------------------
-# append values to par list
-app_par <- function(par, ...) {
-  dots = list(...)
-  if (length(dots) == 0) return(par)
-  stopifnot(!is.null(names(dots)) && !"" %in% names(dots))
-  for (i in seq_along(dots)) {
-    par[[names(dots)[[i]]]] = dots[[i]]
-  }
-  par
-}
-
-
-# global plotting parameters
-op = par()
-#opts_chunk$set(global.par=T) # carry par() over to all chunks
-gpar = list(
-  mar = c(4, 4, 2, 1) + .1,
-  mgp = c(2, .5, 0), # margin b/n fig and axis label, axis text, and axis (line)
-  tcl = -0.4,
-  las = 1,
-  bty = "L",
-  family = "sans", cex=0.8
-)
