@@ -6,7 +6,6 @@ rents = fread("data/processed/rents_homes-apartments_clean.csv")
 setnames(rents, 'ad_end_mon', 'mon')
 rents[, lndist := log(1 + dist2cbd/1000)] # adding 1 avoids log(dist->0) becoming -Inf
 
-
 ## required variables
 dep_var = 'lnrent_sqm'
 fixeffs = c('did', 'mon','year')

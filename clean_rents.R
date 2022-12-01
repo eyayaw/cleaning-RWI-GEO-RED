@@ -31,6 +31,10 @@ rents_homes[, (not4Homes) := special_code]
 rents_aparts[, (not4Aparts) := special_code]
 rents = rbindlist(list(rents_homes, rents_aparts), use.names=TRUE)
 
+# housekeeping
+rm(rents_homes, rents_aparts)
+
+# rename the grid variable to grid_id
 if (!("grid_id" %in% names(rents))) {
   if ("ergg_1km" %in% names(rents)) {
     setnames(rents, "ergg_1km", "grid_id")
@@ -251,7 +255,7 @@ for (i in seq_along(binary_vars)) {
 rents[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 
 # house keeping
-rm(binary_vars, i, check_for_0)
+rm(binary_vars, i)
 
 ### drop not-finished houses: House in process of planning or building ----
 # rents = rents[!(constr_phase %like% "(House in process of )?(planning|building)"), ]
@@ -312,7 +316,7 @@ rents[, cpi := NULL] # remove cpi column
 
 
 # zipcodes -----
-# rents = rents[!(zipcode %like% "^-(000)?"), ] # rm missing zip codes, if any
+rents = rents[zipcode > 0, ] # there are some -9 zipcodes
 rents[, `:=`(zipcode = sprintf("%05i", zipcode))] # make 5 digit
 
 
@@ -385,4 +389,9 @@ fpath = "data/processed/rents_homes-apartments_clean.csv" # path for saving the 
 if (file.exists(fpath)) {
   warning("File has been overwritten!", call. = FALSE)
 }
+
 fwrite(rents, fpath)
+
+rm(list = setdiff(ls(), lsf.str())) # remove all objects except for functions
+gc() # initiate the garbage collector
+

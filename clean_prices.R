@@ -32,6 +32,9 @@ purchases_homes[, (not4Homes) := special_code]
 purchases_aparts[, (not4Aparts) := special_code]
 purchases = rbindlist(list(purchases_homes, purchases_aparts), use.names=TRUE)
 
+# housekeeping
+rm(purchases_homes, purchases_aparts)
+
 if (!("grid_id" %in% names(purchases))) {
   if ("ergg_1km" %in% names(purchases)) {
     setnames(purchases, "ergg_1km", "grid_id")
@@ -327,11 +330,9 @@ purchases = merge(purchases, cpi[year >= min(purchases$year), ],
 purchases[, price := price / (cpi/100)]  # divide by the deflator
 purchases[, cpi := NULL] # remove cpi column
 
-
 # zipcodes -----
-# purchases = purchases[!(zipcode %like% "^-(000)?"), ] # rm missing zip codes, if any
+purchases = purchases[zipcode > 0, ] # there are some -9 zipcodes
 purchases[, `:=`(zipcode = sprintf("%05i", zipcode))] # make 5 digit
-
 
 # Define new vars ----
 purchases[, c('lnprice', 'price_sqm') := .(log(price), price/floor_space)]
@@ -403,4 +404,9 @@ fpath = 'data/processed/purchases_homes-apartments_clean.csv' # path for saving 
 if (file.exists(fpath)) {
   warning("File has been overwritten!", call. = FALSE)
 }
+
 fwrite(purchases, fpath)
+
+rm(list = setdiff(ls(), lsf.str())) # remove all objects except for functions
+gc() # initiate the garbage collector
+

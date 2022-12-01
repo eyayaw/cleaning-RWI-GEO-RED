@@ -6,7 +6,6 @@ purchases = fread("data/processed/purchases_homes-apartments_clean.csv")
 setnames(purchases, "ad_end_mon", "mon")
 purchases[, lndist := log(1 + dist2cbd/1000)] # dist to the cbd in km
 
-
 # required variables
 dep_var = 'lnprice_sqm'
 fixeffs = c('did', 'mon','year')
