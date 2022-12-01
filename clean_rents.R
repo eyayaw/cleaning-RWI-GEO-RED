@@ -255,7 +255,7 @@ for (i in seq_along(binary_vars)) {
 rents[, (binary_vars) := lapply(.SD, as.factor), .SDcols = binary_vars]
 
 # house keeping
-rm(binary_vars, i, check_for_0)
+rm(binary_vars, i)
 
 ### drop not-finished houses: House in process of planning or building ----
 # rents = rents[!(constr_phase %like% "(House in process of )?(planning|building)"), ]
