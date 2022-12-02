@@ -1,6 +1,6 @@
 library(fixest)
 library(data.table)
-source('script/helpers/helpers.R')
+source('helpers/helpers.R')
 
 rents = fread("data/processed/rents_homes-apartments_clean.csv")
 setnames(rents, 'ad_end_mon', 'mon')
