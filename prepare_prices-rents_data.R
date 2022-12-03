@@ -4,7 +4,7 @@ source("helpers/base-helpers.R")
 source("helpers/helpers.R")
 
 # params
-since_when = Sys.getenv("YEAR_START") # keep observations since
+since_when = Sys.getenv("YEAR_START") |> as.integer() # keep observations since
 extract_raw_files = FALSE # if not extracted, extract files
 
 
@@ -26,14 +26,14 @@ extractdir = Sys.getenv("RED_FOLDER")
 if (extract_raw_files) {
   # o for overwrite d for directory
   system(sprintf("unzip -o -d %s %s", extractdir, zipfile)) # extract to the RED folder
-  }
+}
 
 
 ## Stata files ----
 dlist = c(
-  `homes-sales` = "HK_SUF",
+  `homes-purchases` = "HK_SUF",
   `homes-rents` = "HM_SUF",
-  `apartments-sales` = "WK_SUF",
+  `apartments-purchases` = "WK_SUF",
   `apartments-rents` = "WM_SUF"
 )
 
@@ -76,14 +76,14 @@ for (h in seq_along(dlist)) {
 
   # a matrix showing whether a variable is available or not in each data set
   if (FALSE) {
-  data_record = matrix(nrow = length(all_vars), ncol = length(var_list))
-  dimnames(data_record) = list(all_vars, names(var_list))
-  for (v in seq_along(all_vars)) {
-    for (i in seq_along(var_list)) {
-      data_record[v, i] = as.integer(all_vars[[v]] %in% var_list[[i]])
+    data_record = matrix(nrow = length(all_vars), ncol = length(var_list))
+    dimnames(data_record) = list(all_vars, names(var_list))
+    for (v in seq_along(all_vars)) {
+      for (i in seq_along(var_list)) {
+        data_record[v, i] = as.integer(all_vars[[v]] %in% var_list[[i]])
+      }
     }
-  }
-  data_record = cbind(data_record, sum = rowSums(data_record))
+    data_record = cbind(data_record, sum = rowSums(data_record))
   }
 
   ## combine datasets across by year
@@ -141,3 +141,6 @@ for (h in seq_along(dlist)) {
   rm(df_suf)
   gc()
 }
+
+rm(list = setdiff(ls(), lsf.str())) # remove all objects except for functions
+gc() # initiate the garbage collector

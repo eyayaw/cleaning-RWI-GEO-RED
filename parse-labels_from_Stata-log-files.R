@@ -1,4 +1,4 @@
-source("script/helpers/base-helpers.R")
+source("helpers/base-helpers.R")
 makeNames <- function(x, sep = "_") {
     nms = make.names(tolower(x), allow_ = FALSE)
     nms = gsub("\\.+", sep, nms)
@@ -14,7 +14,7 @@ makeNames <- function(x, sep = "_") {
 get_labels <- function(path) {
   if (!grepl("Labels_Immoscout_(W|H)(K|M)_en[.]txt$", path)) {
     stop('Expecting a Stata log file with `_en.txt` ending', call. = FALSE)
-    }
+  }
   labels = readLines(path)
   header_end = grep("opened on:", labels)
   footer_start = max(grep("name:", labels))
@@ -77,18 +77,18 @@ get_labels <- function(path) {
   })
 
   return(list(
-  variable = variable_labels,
-  value = value_labels,
-  has_variable_label = has_variable_label,
-  has_value_label = has_value_label
-))
+    variable = variable_labels,
+    value = value_labels,
+    has_variable_label = has_variable_label,
+    has_value_label = has_value_label
+  ))
 }
 
 # write to disk ----
-labels = get_labels('../Common-Data/.RED_v6.0/Dokumentation/Labels/Labels_Immoscout_HK_en.txt')
+labels = get_labels(paste0(Sys.getenv('RED_FOLDER'), '/Dokumentation/Labels/Labels_Immoscout_HK_en.txt'))
 
 dict = with(labels$variable, data.frame(var_de = name, label, var_en = makeNames(label)))
-write.csv(dict, 'data/variable-and-value_labels/variable-labels.csv', row.names = FALSE)
+write.csv(dict, 'variable-and-value_labels/variable-labels.csv', row.names = FALSE)
 
 # has labels other than labels for missing values
 has_real_labels = with(labels, sapply(value, \(x) !all(x[['value']] < 0)))
@@ -99,7 +99,7 @@ with(labels, lapply(
     x
   ))
 )) |> do.call(what = rbind) |>
-  write.table('data/variable-and-value_labels/value-labels.txt', quote = FALSE, row.names = FALSE)
+  write.table('variable-and-value_labels/value-labels.txt', quote = FALSE, row.names = FALSE)
 
 # value labels for missing values
 special_value_labels = with(labels, value[!has_real_labels]) |>
@@ -107,7 +107,7 @@ special_value_labels = with(labels, value[!has_real_labels]) |>
   unique()
 rownames(special_value_labels) = NULL
 write.csv(
-  special_value_labels,'data/variable-and-value_labels/missing-value_labels.csv',
+  special_value_labels,'variable-and-value_labels/missing-value_labels.csv',
   quote = FALSE, row.names = FALSE
   )
 

@@ -1,6 +1,6 @@
 library(data.table)
 library(sf)
-source('script/helpers/helpers.R') # for count_missing()
+source('helpers/helpers.R') # for count_missing()
 
 purchases_homes = fread(sprintf("data/homes-purchases_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
 purchases_aparts = fread(sprintf("data/apartments-purchases_%s-%s.csv", Sys.getenv("YEAR_START"), Sys.getenv("YEAR_END")))
@@ -278,7 +278,7 @@ rm(order_of_vars, binary_vars, i)
 
 
 ### drop districts that do not exist under the BKG (2019.12.31) definition, if any ----
-districts = fread("extra/admin-areas/admin-areas/districts_bkg.csv", select="did")
+districts = fread("extra/admin-areas/districts_bkg.csv", select="did")
 purchases = merge(purchases, districts, 'did')
 rm(districts)
 
@@ -393,7 +393,7 @@ purchases[, age1 := renov_year - constr_year]
 n = nrow(purchases)
 purchases = purchases[
   exp(lnprice_sqm) >= 250 & exp(lnprice_sqm) <= 25000 & floor_space >= 30 & floor_space <= 500,
-  ]
+]
 nrow(purchases)/n # without duplicates
 
 # write to disk ----
