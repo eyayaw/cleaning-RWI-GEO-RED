@@ -17,12 +17,12 @@ get_labels <- function(path) {
   }
   labels = readLines(path)
   header_end = grep("opened on:", labels)
-  footer_start = max(grep("name:", labels))
-  if (is.null(header_end) || is.null(footer_start)){
+  footer_start = grep("name:", labels)
+  if (length(header_end)==0 || length(footer_start)==0){
     stop("Could not parse the location of the header and footer!", call. = FALSE)
   }
   labels = labels[-(1:header_end)]       # rm header
-  labels = labels[1:(footer_start - 1L)] # rm footer
+  labels = labels[1:(max(footer_start) - 1L)] # rm footer
 
   # variables' info is separated by 'empty line' in the file
   index = which(labels == "")
@@ -113,19 +113,19 @@ write.csv(
 
 # get value labels of a factor variable
 ## include_missing is to exclude -5 to -11 which are special missing values
-get_value_labels <- function(var_name, include_missing = TRUE) {
+get_value_labels <- function(var_name, include_missing=TRUE) {
   stopifnot(
     `The \`var_name\` is not correct. Try passing the var_name in german?` = var_name %in% names(labels$value)
   )
-  x <- labels$value[[var_name]]
+  x = labels$value[[var_name]]
   if (is.null(x)) {
     warning("label for `", var_name, "` not found. Make sure that you pass the correct var name.", call. = FALSE)
   }
-  if (include_missing) {
-    x
-  } else if (!include_missing) {
-    x[which(x$value > -1), ]
+  if (isTRUE(include_missing)) {
+    return(x)
   }
+   x[which(x$value > -1), ]
+  
 }
 
 # test
