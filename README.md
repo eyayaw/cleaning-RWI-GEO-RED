@@ -12,6 +12,13 @@ Somes of the steps in the scripts might not be relevant for your particular use 
 6. [hedonic-model_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_rents.R)
 
 ## Usage
+### Install the development version of data.table (v 1.14.7): 
+```r
+install.packages("data.table")
+
+# latest development version
+data.table::update_dev_pkg()
+```
 
 Besides installing packages, you need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
 
