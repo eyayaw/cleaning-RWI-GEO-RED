@@ -381,9 +381,9 @@ if (any(purchases[, renov_year > maxYear])) {
   purchases[renov_year > maxYear, renov_year := (maxYear)]
 }
 
-# compute age of houses, and renovation speed
+# compute age of houses, and time passed since last renovation
 purchases[, age0 := year - constr_year] # age of the property at the time of advertisement
-purchases[, age1 := renov_year - constr_year]
+purchases[, age1 := year - renov_year]
 
 
 # handle outliers ----
