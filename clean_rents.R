@@ -7,15 +7,21 @@ rents_aparts = fread(sprintf("data/apartments-rents_%s-%s.csv", Sys.getenv("YEAR
 
 # rm duplicates
 nrh = nrow(rents_homes)
-idx = rents_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rents_homes = rents_homes[idx, ]
+rents_homes = rents_homes[order(obid, spell)]
+# get all dupID_gen == 1 (likely duplicate), subtract 1 to get the previous element 
+idx = which(rents_homes$dupID_gen == 1) - 1 
+# exclude the predecessor of duplicates
+rents_homes = rents_homes[!idx, ]
 message(sprintf("%.2f%% were duplicates.", 100-100*nrow(rents_homes)/nrh))
 rents_homes[, spell := NULL]
 rm(idx)
 
 nra = nrow(rents_aparts)
-idx = rents_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-rents_aparts = rents_aparts[idx, ]
+rents_aparts = rents_aparts[order(obid, spell)]
+# get all dupID_gen == 1 (likely duplicate), subtract 1 to get the previous element 
+idx = which(rents_aparts$dupID_gen == 1) - 1 
+# exclude the predecessor of duplicates
+rents_aparts = rents_aparts[!idx, ]
 message(sprintf("%.2f%% were duplicates.", 100-100*nrow(rents_aparts)/nra))
 rents_aparts[, spell := NULL]
 rm(idx)
