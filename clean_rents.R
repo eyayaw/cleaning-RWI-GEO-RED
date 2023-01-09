@@ -38,7 +38,7 @@ rents_aparts[, (not4Aparts) := special_code]
 rents = rbindlist(list(rents_homes, rents_aparts), use.names=TRUE)
 
 # housekeeping
-rm(rents_homes, rents_aparts)
+rm(rents_homes, rents_aparts); gc()
 
 # rename the grid variable to grid_id
 if (!("grid_id" %in% names(rents))) {

@@ -12,13 +12,21 @@ Somes of the steps in the scripts might not be relevant for your particular use 
 6. [hedonic-model_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/hedonic-model_rents.R)
 
 ## Usage
-### Install the development version of data.table (v 1.14.7): 
+
+### Requirements
+
+- `R version 4.2` because the script uses the new pipes (`|>` and especially `|> fn(..., param=_)`)
+
+*Install the development version of data.table (v 1.14.7):*
+
 ```r
 install.packages("data.table")
 
 # latest development version
 data.table::update_dev_pkg()
 ```
+
+### Preparation
 
 Besides installing packages, you need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
 
@@ -37,7 +45,7 @@ Furthermore, you need to download additional data:
 [clean_prices.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_prices.R) and [clean_rents.R](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R) filter and clean the data for house/apartment prices and rents respectively. Furthermore, datasets for houses and apartments are combined, 
 
 - Filtering:
-  - [only keep the maximum spell for each obid-year combination](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R#L15)
+  - [for each observation which is classified as 'likely duplicate' (`dupID_gen == 1`), drop the previous one](https://github.com/eyayaw/cleaning-RWI-GEO-RED/blob/main/clean_rents.R#L15)
   - rents: only keep observations with `grid_id > 0 & rent > 0 & floor_space > 0 & num_rooms > 0 & utilities > 0`
   - prices: only keep observations with `grid_id > 0 & price > 0 & floor_space > 0 & num_rooms > 0` 
 

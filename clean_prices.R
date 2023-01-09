@@ -39,7 +39,7 @@ purchases_aparts[, (not4Aparts) := special_code]
 purchases = rbindlist(list(purchases_homes, purchases_aparts), use.names=TRUE)
 
 # housekeeping
-rm(purchases_homes, purchases_aparts)
+rm(purchases_homes, purchases_aparts); gc()
 
 if (!("grid_id" %in% names(purchases))) {
   if ("ergg_1km" %in% names(purchases)) {
