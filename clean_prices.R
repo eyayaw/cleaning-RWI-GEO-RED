@@ -8,15 +8,21 @@ purchases_aparts = fread(sprintf("data/apartments-purchases_%s-%s.csv", Sys.gete
 
 # rm duplicates
 nrh = nrow(purchases_homes)
-idx = purchases_homes[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-purchases_homes = purchases_homes[idx, ]
+purchases_homes = purchases_homes[order(obid, spell)]
+# get all dupID_gen == 1 (likely duplicate), subtract 1 to get the previous element 
+idx = which(purchases_homes$dupID_gen == 1) - 1 
+# exclude the predecessor of duplicates
+purchases_homes = purchases_homes[!idx, ]
 message(sprintf("%.2f%% were duplicates.", 100-100*nrow(purchases_homes)/nrh))
 purchases_homes[, spell := NULL]
 rm(idx)
 
 nra = nrow(purchases_aparts)
-idx = purchases_aparts[, .(idx=.I[which.max(spell)]), .(obid, year)][, idx]
-purchases_aparts = purchases_aparts[idx, ]
+purchases_aparts = purchases_aparts[order(obid, spell)]
+# get all dupID_gen == 1 (likely duplicate), subtract 1 to get the previous element 
+idx = which(purchases_aparts$dupID_gen == 1) - 1 
+# exclude the predecessor of duplicates
+purchases_aparts = purchases_aparts[!idx, ]
 message(sprintf("%.2f%% were duplicates.", 100-100*nrow(purchases_aparts)/nra))
 purchases_aparts[, spell := NULL]
 rm(idx)
@@ -33,7 +39,7 @@ purchases_aparts[, (not4Aparts) := special_code]
 purchases = rbindlist(list(purchases_homes, purchases_aparts), use.names=TRUE)
 
 # housekeeping
-rm(purchases_homes, purchases_aparts)
+rm(purchases_homes, purchases_aparts); gc()
 
 if (!("grid_id" %in% names(purchases))) {
   if ("ergg_1km" %in% names(purchases)) {
