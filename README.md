@@ -15,9 +15,9 @@ Somes of the steps in the scripts might not be relevant for your particular use 
 
 ### Requirements
 
-- `R version 4.2` because the script uses the new pipes (`|>` and especially `|> fn(..., param=_)`)
+- `R 4.2` or higher
 
-*Install the development version of data.table (v 1.14.7):*
+*Development version of data.table (v 1.14.7) or higher:*
 
 ```r
 install.packages("data.table")
@@ -28,13 +28,14 @@ data.table::update_dev_pkg()
 
 ### Preparation
 
-Besides installing packages, you need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
+Besides installing packages, you may need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
 
 ```
 RED_FOLDER=C:/Users/x/RWI-GEO-RED_v6
 YEAR_START=2007
 YEAR_END=2021
 ```
+Or, define those constants inside the respective scripts. 
 
 Furthermore, you need to download additional data:
 
