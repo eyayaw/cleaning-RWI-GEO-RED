@@ -17,27 +17,27 @@ Somes of the steps in the scripts might not be relevant for your particular use 
 
 - `R 4.2` or higher
 
-*Development version of data.table (v 1.14.7) or higher:*
+- Development version of data.table (v 1.14.7) or higher:
 
-```r
-install.packages("data.table")
-
-# latest development version
-data.table::update_dev_pkg()
-```
+  ```r
+  install.packages("data.table")
+  
+  # latest development version
+  data.table::update_dev_pkg()
+  ```
 
 ### Preparation
 
 Besides installing packages, you may need to create a `.Renviron` file for the location of the RWI-GEO-RED data and the desired start and end year, for example:
 
-```
+```bash
 RED_FOLDER=C:/Users/x/RWI-GEO-RED_v6
 YEAR_START=2007
 YEAR_END=2021
 ```
-Or, define those constants inside the respective scripts. 
+> Note: Alternatively, you can define those constants inside the respective scripts. 
 
-Furthermore, you need to download additional data:
+**Furthermore, you need to download additional data:**
 
 - For the CPI to work, [download the monthly CPI from Destatis](https://www-genesis.destatis.de/genesis/online?sequenz=statistikTabellen&selectionname=61121&language=en#abreadcrumb) (make sure to select the years you need) and save it as `extra/cpi_61121-0002.csv`
 
